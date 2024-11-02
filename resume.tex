@@ -1,0 +1,58 @@
+% !TEX engine = xelatex
+
+% ===================================== Metadata =====================================
+% Use the resume.cls as the documentclass
+\documentclass[]{resume}
+
+% Use the fancyhdr package to have custom headers and footers
+\usepackage{fancyhdr}
+
+% Set the pagestyle to fancy, i.e. custom headers and footers
+\pagestyle{fancy}
+
+% apply presets
+\loadpresent{deedy-inspired-open-fonts}
+
+% Set the right footer to the page number
+\rfoot{Page \thepage{}\hspace{1pt}}
+
+% ===================================== Document =====================================
+
+% Begin the document
+\begin{document}
+
+% \debug{}
+
+% Use the custom last updated command to display the last updated date
+% Page
+% +------------------------------------------------>
+% |
+% |                                   +------------+
+% |                                   | Last       |
+% |                                   | Updated    |
+% |                                   +------------+
+% |
+\lastupdated{}
+
+% ================================== Name Section ===================================
+
+% add the name and contact information
+%       RAHUL AGARWAL                    
+
+%       xxxxx | xxxx
+%    xxx | xxx | xxxx
+% _________________________________________________
+\namesection{Rahul}{Agarwal}{
+  \urlstyle{same}
+  \href{https://therahulagarwal.com}{therahulagarwal.com}|
+  \href{https://github.com/ragarwalll}{github/ragarwalll} |
+  \href{https://www.linkedin.com/in/ragarwalll}{linkedin/ragarwalll}\\
+  \href{mailto:contact@therahulagarwal.com}{contact@therahulagarwal.com} |
+  \href{mailto:agarwal.rahul324@gmail.com}{agarwal.rahul324@gmail.com}
+}
+
+\section{Education}
+
+
+% End the document
+\end{document}

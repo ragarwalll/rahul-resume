@@ -1,0 +1,14 @@
+defaultIndent: "  "
+removeTrailingWhitespace:
+  beforeProcessing: 1
+  afterProcessing: 1
+indentAfterItems:
+  itemize: 1
+  enumerate: 1
+  description: 1
+alignAtAmpersand:
+  delims:
+    - align
+    - align*
+    - equation
+    - equation*

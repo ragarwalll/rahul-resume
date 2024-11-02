@@ -1,0 +1,14 @@
+name: main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  latex:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      main_document: resume.tex
+      working_directory: "." # Root directory

@@ -1,0 +1,26 @@
+% modifiers/default.tex - Sets the default settings for the XeLaTeX resume
+
+% Set up the coordinates for the entire document
+% Put name in top left
+% \begin{textblock}{70}(10,10)
+%     John Smith
+% \end{textblock}
+% % Put contact info in top right
+% \begin{textblock}{40}(150,10)
+%     john@email.com
+%     (555) 555-5555
+% \end{textblock}
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
+
+% Make sure that the orgin is moved down to 5mm towards the bottom of the page
+% Without textblockorigin:          With textblockorigin{0mm}{5mm}:
+% +------------------+              +------------------+
+% |Origin (0,0)      |              |                  |
+% |                  |              |Origin (0,0)      |  ← Moved down 5mm
+% |                  |              |                  |
+% |                  |              |                  |
+\textblockorigin{0mm}{5mm}
+
+% Remove spacing around sections
+\titlespacing{\section}{0pt}{0pt}{0pt}

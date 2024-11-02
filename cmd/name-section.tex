@@ -1,0 +1,39 @@
+% cmd/name-section.tex: Definition of command \namesection
+% chktex-file 1
+
+% Name command
+\newcommand{\namesection}[3]{ % New command that takes 3 parameters (#1, #2, #3)
+  \centering{  % Centers the content
+    \sffamily % Sans-serif font family
+    % First name styling
+    \ifx\firstnamefontpath\empty
+      \fontspec{\firstnamefont}
+    \else
+      \fontspec[Path = \firstnamefontpath]{\firstnamefont}
+    \fi
+    \fontsize{40pt}{10cm}
+    \selectfont #1  % Very large first name
+    % Last name styling
+    \ifx\lastnamefontpath\empty
+      \fontspec{\lastnamefont}
+    \else
+      \fontspec[Path = \lastnamefontpath]{\lastnamefont}
+    \fi
+    \selectfont #2  % Last name
+  } \\ % Line break
+  \vspace{5pt} % Add 5pt vertical space
+  % Subtitle/info line
+  \centering{
+    \color{headings}
+    \ifx\profilelinksfontpath\empty
+      \fontspec{\profilelinksfont}
+    \else
+      \fontspec[Path = \profilelinksfontpath]{\profilelinksfont}
+    \fi
+    \fontsize{11pt}{14pt}
+    \selectfont #3
+  }
+  % Horizontal line across page
+  \noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+  \vspace{-15pt}  % Move up 15pt
+}

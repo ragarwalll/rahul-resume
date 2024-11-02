@@ -1,0 +1,19 @@
+% modifiers/sections.tex - This file contains the section formatting for the XeLaTeX template
+% chktex-file 1
+% Format the section titles
+\titleformat{\section}                  % Formatting \section command
+{                                       % Format of the section title
+  \color{headings}                    % Color we defined earlier (gray)
+  \scshape                            % Small caps
+  \ifx\sectionfontpath\empty
+    \fontspec{\sectionfont}
+  \else
+    \fontspec[Path = \sectionfontpath]{\sectionfont}
+  \fi
+  \fontsize{16pt}{24pt}\selectfont    % 16pt font size, 24pt line height
+  \raggedright                      % Align left
+  \uppercase                        % Make text uppercase
+}
+{} % Label format (empty here - no numbers)
+{0em} % Separation between label and title
+{} % Before-code (empty)

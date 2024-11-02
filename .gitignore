@@ -1,0 +1,9 @@
+.texpadtmp
+.DS_Store
+resume.synctex.gz
+resume.out
+*.log
+resume.aux
+node_modules
+resume.fdb_latexmk
+*.pdf

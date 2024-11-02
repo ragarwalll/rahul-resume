@@ -1,0 +1,236 @@
+name: LaTeX CI
+
+on:
+  workflow_call:
+    inputs:
+      main_document:
+        description: "Main LaTeX document to build"
+        required: true
+        type: string
+      working_directory:
+        description: "Directory containing LaTeX files"
+        required: false
+        default: "."
+        type: string
+
+jobs:
+  latex-check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup cache keys
+      - name: Set installation commands hash
+        id: hash
+        run: |
+          PERL_MODULES="Log::Log4perl YAML::Tiny File::HomeDir Unicode::GCString"
+          echo "packages_hash=$(echo $PERL_MODULES | sha256sum | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      # Create local directory for Perl modules and restore cache
+      - name: Setup Perl local::lib
+        run: |
+          echo "Creating Perl local directory..."
+          mkdir -p ~/perl5
+          eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+          echo 'eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"' >> ~/.bashrc
+
+      - name: Restore cached Perl modules
+        id: cache-perl-local
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/perl5
+          key: perl-local-${{ steps.hash.outputs.packages_hash }}
+          restore-keys: |
+            perl-local-
+
+      # Install all dependencies in correct order
+      - name: Install System dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cpanminus \
+            texlive-full \
+            chktex
+
+      - name: Install Perl and CPAN dependencies
+        run: |
+          if [ "${{ steps.cache-perl-local.outputs.cache-hit }}" != 'true' ]; then
+            echo "Cache miss - installing Perl dependencies..."
+            # Install modules to local directory
+            cpanm --local-lib=~/perl5 local::lib
+            eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+            
+            cpanm --notest Log::Log4perl
+            cpanm --notest YAML::Tiny
+            cpanm --notest File::HomeDir
+            cpanm --notest Unicode::GCString
+          else
+            echo "Using cached Perl modules from ~/perl5"
+            eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+          fi
+
+      # Save cache after installation
+      - name: Save Perl modules cache
+        if: steps.cache-perl-local.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/perl5
+          key: perl-local-${{ steps.hash.outputs.packages_hash }}
+
+      # Verification and processing steps
+      - name: Find and validate config files
+        id: config
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          # Check for latexindent config
+          if [ -f latexindent.yaml ]; then
+            echo "indent_config=latexindent.yaml" >> $GITHUB_OUTPUT
+            echo "✅ Found latexindent.yaml"
+          else
+            echo "⚠️ No latexindent.yaml found, will use default settings"
+          fi
+
+          # Check for chktex config
+          if [ -f .chktexrc ]; then
+            echo "chktex_config=.chktexrc" >> $GITHUB_OUTPUT
+            echo "✅ Found .chktexrc"
+          else
+            echo "⚠️ No .chktexrc found, will use default settings"
+          fi
+
+      - name: Find all TeX files
+        id: find-tex
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          files=$(find . -type f \( -name "*.tex" -o -name "*.cls" \) \
+            ! -path "./node_modules/*" \
+            ! -path "./build/*" \
+            ! -path "./dist/*" \
+            ! -path "./_minted-*/*" \
+            -printf "%P\n")
+
+          echo "$files" > tex_files.txt
+          count=$(echo "$files" | wc -l)
+          echo "file_count=$count" >> $GITHUB_OUTPUT
+          echo "Found $count TeX files to process"
+
+      - name: Run LaTeX formatting check
+        id: format
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          format_errors=0
+          total_files=$(cat tex_files.txt | wc -l)
+
+          echo "=== Running Formatter ==="
+          while IFS= read -r file; do
+            echo -e "\nChecking format of $file..."
+            
+            # Prepare command with or without config
+            if [ "${{ steps.config.outputs.indent_config }}" != "" ]; then
+              indent_cmd="latexindent -kv -s -l ${{ steps.config.outputs.indent_config }}"
+            else
+              indent_cmd="latexindent -kv -s"
+            fi
+            
+            # Run formatting check
+            if ! $indent_cmd "$file"; then
+              echo "❌ Formatting issues in $file"
+              format_errors=$((format_errors + 1))
+            else
+              echo "✅ $file is properly formatted"
+            fi
+          done < tex_files.txt
+
+          # Store statistics
+          echo "format_errors=$format_errors" >> $GITHUB_OUTPUT
+          echo "total_files=$total_files" >> $GITHUB_OUTPUT
+
+          if [ $format_errors -gt 0 ]; then
+            echo "❌ Found formatting issues in $format_errors files"
+            exit 1
+          fi
+
+      - name: Run LaTeX linting
+        id: lint
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          lint_errors=0
+          lint_warnings=0
+
+          echo "=== Running Linter ==="
+          while IFS= read -r file; do
+            echo -e "\nLinting $file..."
+            
+            # Create directory for log file if it doesn't exist
+            log_dir=$(dirname "lint_${file}.log")
+            mkdir -p "$log_dir"
+            
+            # Prepare command with or without config
+            if [ "${{ steps.config.outputs.chktex_config }}" != "" ]; then
+              chktex_cmd="chktex -l ${{ steps.config.outputs.chktex_config }}"
+            else
+              chktex_cmd="chktex"
+            fi
+            
+            # Run linting and capture both stdout and stderr
+            if ! $chktex_cmd "$file" > "lint_${file}.log" 2>&1; then
+              echo "⚠️ Linting issues found in $file"
+              cat "lint_${file}.log"
+              if grep -q "Error" "lint_${file}.log"; then
+                lint_errors=$((lint_errors + 1))
+              else
+                lint_warnings=$((lint_warnings + 1))
+              fi
+            else
+              echo "✅ No linting issues in $file"
+            fi
+          done < tex_files.txt
+
+          # Store statistics
+          echo "lint_errors=$lint_errors" >> $GITHUB_OUTPUT
+          echo "lint_warnings=$lint_warnings" >> $GITHUB_OUTPUT
+
+          if [ $lint_errors -gt 0 ]; then
+            echo "❌ Found $lint_errors linting errors"
+            exit 1
+          fi
+
+          if [ $lint_warnings -gt 0 ]; then
+            echo "⚠️ Found $lint_warnings linting warnings"
+            exit 1
+          fi
+
+      - name: Build PDF with XeLaTeX
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          latexmk -xelatex \
+            -interaction=nonstopmode \
+            -file-line-error \
+            ${{ inputs.main_document }}
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## LaTeX Processing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "### Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "- Total files processed: ${{ steps.find-tex.outputs.file_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Files with formatting issues: ${{ steps.format.outputs.format_errors }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Files with lint errors: ${{ steps.lint.outputs.lint_errors }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Files with lint warnings: ${{ steps.lint.outputs.lint_warnings }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-output
+          path: ${{ inputs.working_directory }}/*.pdf
+          if-no-files-found: error
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-logs
+          path: |
+            ${{ inputs.working_directory }}/*.log
+            ${{ inputs.working_directory }}/lint_*.log

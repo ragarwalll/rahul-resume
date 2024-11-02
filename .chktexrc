@@ -1,0 +1,27 @@
+# Custom warning levels
+VerbEnvir
+{
+    verbatim
+    lstlisting
+    minted
+    comment
+    rawhtml
+    rawlatex
+    equation
+    equation*
+    math
+    displaymath
+    gather
+    gather*
+    align
+    align*
+}
+
+# Silent warnings
+Silent
+{
+    1  # Command terminated with space
+    22  # Comment displayed
+    24  # Delete this space
+    44  # User-specified
+}

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo 'code scans running...'
+
+bun commit:lint
+bun run lint
+bun run build

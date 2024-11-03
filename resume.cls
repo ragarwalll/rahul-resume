@@ -1,5 +1,6 @@
 % chktex-file 44
 % chktex-file 27
+
 % resume.cls - A class file for LaTeX to create a resume    
 % @author: ragarwalll
 % @inspired by: deedy
@@ -76,10 +77,14 @@
   \input{modifiers/colors.tex}
   \input{modifiers/fonts.tex}
   \input{modifiers/sections.tex}
+  \input{modifiers/sub-sections.tex}
 
   % load the custom commands
   \input{cmd/last-updated.tex}
   \input{cmd/name-section.tex}
+  \input{cmd/each-sub-section.tex}
+  \input{cmd/descriptor.tex}
+  \input{cmd/location.tex}
 
 }
 

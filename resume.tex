@@ -16,6 +16,9 @@
 % Set the right footer to the page number
 \rfoot{Page \thepage{}\hspace{1pt}}
 
+% load the data files
+\input{data.tex}
+
 % ===================================== Document =====================================
 
 % Begin the document
@@ -42,15 +45,36 @@
 %       xxxxx | xxxx
 %    xxx | xxx | xxxx
 % _________________________________________________
-\namesection{Rahul}{Agarwal}{
+\namesection{\datafirstname}{\datalastname}{
   \urlstyle{same}
   \href{https://github.com/ragarwalll}{github/ragarwalll} |
   \href{https://www.linkedin.com/in/ragarwalll}{linkedin/ragarwalll}\\
   \href{mailto:agarwal.rahul324@gmail.com}{agarwal.rahul324@gmail.com}
 }
 
-\section{Education}
+% Then use them in your minipages
+\noindent
+\begin{minipage}[t]{\goldenleft\textwidth}
+  % Left content (larger)
+  \section{Experience}
+  \eachsubsection{SAP}
+  \descriptor{| Software Engineer }
+  \location{Jan 2015 Present | New York, NY}
 
+  \section{Experience}
+  College of Engineering \
+  Magna Cum Laude
+  \eachsubsection{Facebook}
+  College of Engineering \\
+  Magna Cum Laude
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{\goldenright\textwidth}
+  % Right content (smaller)
+  % \section{Education}
+  % College of Engineering \\
+  % Magna Cum Laude
+\end{minipage}
 
 % End the document
 \end{document}

@@ -1,0 +1,16 @@
+% chktex-file 1
+% cmd/location.tex - A XeLaTeX template snippet to format the locations
+
+\newcommand{\location}[1]{
+  \color{headings}
+  \raggedright
+  \scshape
+  \ifx\locationfontpath\empty
+    \fontspec{\locationfont}
+  \else
+    \fontspec[Path = \locationfontpath]{\locationfont}
+  \fi
+  \fontsize{\locationfontsize}{\locationfontheight}
+  \selectfont {#1\\}
+  \normalfont
+}

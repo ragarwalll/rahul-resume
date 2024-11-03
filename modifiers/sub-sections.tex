@@ -1,0 +1,30 @@
+% modifiers/sub-sections.tex - The file contains the sub-section formatting for the XeLaTeX template
+% chktex-file 1
+
+% This block defines the formatting for subsection titles
+\titleformat{\subsection}{      % Specifies we're formatting the \subsection level headers
+  \color{subheadings}     % Sets the color to a predefined color named 'subheadings'
+  \ifx\subsectionfontpath\empty
+    \fontspec{\subsectionfont}
+  \else
+    \fontspec[Path = \subsectionfontpath]{\subsectionfont}
+  \fi
+  \fontsize{\normalfontsize}{\normalfontheight}\selectfont
+  \bfseries             % Makes the text bold
+  \uppercase            % Converts the text to uppercase
+}
+{}
+{0em}                 % Sets the separation between label and title to 0em
+{}
+
+% This block defines the spacing around subsection titles
+\titlespacing{\subsection}  % Specifies we're setting spacing for subsection headers
+{0pt}                % Left margin indent (set to 0)
+{\parskip}           % Space before the title (equal to paragraph skip)
+{-\parskip}          % Space after the title (negative paragraph skip)
+
+% This block defines the spacing around subsubsection titles
+\titlespacing{\subsubsection}  % Specifies we're setting spacing for subsection headers
+{0pt}                % Left margin indent (set to 0)
+{\parskip}           % Space before the title (equal to paragraph skip)
+{-\parskip}          % Space after the title (negative paragraph skip)

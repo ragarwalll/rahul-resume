@@ -34,6 +34,14 @@
   \def\profilelinksfont{\mediumfont}
 \fi
 
+\ifx\descriptorfont\empty
+  \def\descriptorfont{\mediumfont}
+\fi
+
+\ifx\locationfont\empty
+  \def\locationfont{\mediumfont}
+\fi
+
 % ===========Default Fonts Path===========
 \ifx\fontpath\empty
   % Path is empty, use system font
@@ -100,5 +108,13 @@
 
   \ifx\profilelinksfontpath\empty
     \def\profilelinksfontpath{\fontpath}
+  \fi
+
+  \ifx\descriptorfontpath\empty
+    \def\descriptorfontpath{\fontpath}
+  \fi
+
+  \ifx\locationfontpath\empty
+    \def\locationfontpath{\fontpath}
   \fi
 \fi

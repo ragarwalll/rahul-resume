@@ -1,0 +1,16 @@
+% chktex-file 1
+% cmd/descriptor.tex - A XeLaTeX template snippet to format the descriptors
+
+\newcommand{\descriptor}[1]{
+  \color{subheadings}
+  \raggedright
+  \scshape
+  \ifx\descriptorfontpath\empty
+    \fontspec{\descriptorfont}
+  \else
+    \fontspec[Path = \descriptorfontpath]{\descriptorfont}
+  \fi
+  \fontsize{\descriptorfontsize}{\descriptorfontheight}
+  \selectfont {#1 \\}
+  \normalfont
+}

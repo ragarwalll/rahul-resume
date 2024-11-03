@@ -63,6 +63,9 @@
 % Provides Unicode support
 \usepackage{fontspec,xltxtra,xunicode}
 
+% This command loads the 'xfp' package which provides floating point operations
+\RequirePackage{xfp}
+
 % Command to apply all settings
 \newcommand{\applysettings}{
 

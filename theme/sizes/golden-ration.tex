@@ -1,0 +1,39 @@
+% theme/sizes/golden-ration.tex - sizes for the PDF
+% chktex-file 1
+% chktex-file 36
+
+% Base fontsize and ratio
+\def\normalfontsize{12}
+% \def\normalfontheight{14.832}
+\def\goldenratio{1.618}
+
+% Define all font fontsizes and line fontheights
+\def\tinyfontsize{\fpeval{\normalfontsize/(\goldenratio*\goldenratio*\goldenratio)}pt}
+\def\tinyfontheight{\fpeval{(\normalfontsize/(\goldenratio*\goldenratio*\goldenratio))*\goldenratio}pt}
+
+\def\scriptfontsize{\fpeval{\normalfontsize/(\goldenratio*\goldenratio)}pt}
+\def\scriptfontheight{\fpeval{(\normalfontsize/(\goldenratio*\goldenratio))*\goldenratio}pt}
+
+\def\footnotefontsize{\fpeval{\normalfontsize/(\goldenratio*1.2)}pt}
+\def\footnotefontheight{\fpeval{(\normalfontsize/(\goldenratio*1.2))*\goldenratio}pt}
+
+\def\smallfontsize{\fpeval{\normalfontsize/\goldenratio}pt}
+\def\smallfontheight{\fpeval{(\normalfontsize/\goldenratio)*\goldenratio}pt}
+
+% \def\normalfontsize{\normalfontsize pt}
+\def\normalfontheight{\fpeval{\normalfontsize*\goldenratio}pt}
+
+\def\largefontsize{\fpeval{\normalfontsize*\goldenratio}pt}
+\def\largefontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio}pt}
+
+\def\largerfontsize{\fpeval{\normalfontsize*\goldenratio*1.2}pt}
+\def\largerfontheight{\fpeval{\normalfontsize*\goldenratio*1.2*\goldenratio}pt}
+
+\def\largestfontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio}pt}
+\def\largestfontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio}pt}
+
+\def\hugefontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio*1.2}pt}
+\def\hugefontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*1.2*\goldenratio}pt}
+
+\def\hugestfontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio}pt}
+\def\hugestfontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio*\goldenratio}pt}

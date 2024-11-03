@@ -3,37 +3,43 @@
 % chktex-file 36
 
 % Base fontsize and ratio
-\def\normalfontsize{12}
+\def\normalfontsizepoint{12}
 % \def\normalfontheight{14.832}
 \def\goldenratio{1.618}
 
 % Define all font fontsizes and line fontheights
-\def\tinyfontsize{\fpeval{\normalfontsize/(\goldenratio*\goldenratio*\goldenratio)}pt}
-\def\tinyfontheight{\fpeval{(\normalfontsize/(\goldenratio*\goldenratio*\goldenratio))*\goldenratio}pt}
+\def\tinyfontsize{\fpeval{\normalfontsizepoint/(\goldenratio*\goldenratio*\goldenratio)}pt}
+\def\tinyfontheight{\fpeval{(\normalfontsizepoint/(\goldenratio*\goldenratio*\goldenratio))*\goldenratio}pt}
 
-\def\scriptfontsize{\fpeval{\normalfontsize/(\goldenratio*\goldenratio)}pt}
-\def\scriptfontheight{\fpeval{(\normalfontsize/(\goldenratio*\goldenratio))*\goldenratio}pt}
+\def\scriptfontsize{\fpeval{\normalfontsizepoint/(\goldenratio*\goldenratio)}pt}
+\def\scriptfontheight{\fpeval{(\normalfontsizepoint/(\goldenratio*\goldenratio))*\goldenratio}pt}
 
-\def\footnotefontsize{\fpeval{\normalfontsize/(\goldenratio*1.2)}pt}
-\def\footnotefontheight{\fpeval{(\normalfontsize/(\goldenratio*1.2))*\goldenratio}pt}
+\def\footnotefontsize{\fpeval{\normalfontsizepoint/(\goldenratio*1.2)}pt}
+\def\footnotefontheight{\fpeval{(\normalfontsizepoint/(\goldenratio*1.2))*\goldenratio}pt}
 
-\def\smallfontsize{\fpeval{\normalfontsize/\goldenratio}pt}
-\def\smallfontheight{\fpeval{(\normalfontsize/\goldenratio)*\goldenratio}pt}
+\def\smallfontsize{\fpeval{\normalfontsizepoint/\goldenratio}pt}
+\def\smallfontheight{\fpeval{(\normalfontsizepoint/\goldenratio)*\goldenratio}pt}
 
-% \def\normalfontsize{\normalfontsize pt}
-\def\normalfontheight{\fpeval{\normalfontsize*\goldenratio}pt}
+\def\normalfontsize{\normalfontsizepoint pt}
+\def\normalfontheight{\fpeval{\normalfontsizepoint*\goldenratio}pt}
 
-\def\largefontsize{\fpeval{\normalfontsize*\goldenratio}pt}
-\def\largefontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio}pt}
+\def\largefontsize{\fpeval{\normalfontsizepoint*\goldenratio}pt}
+\def\largefontheight{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio}pt}
 
-\def\largerfontsize{\fpeval{\normalfontsize*\goldenratio*1.2}pt}
-\def\largerfontheight{\fpeval{\normalfontsize*\goldenratio*1.2*\goldenratio}pt}
+\def\largerfontsize{\fpeval{\normalfontsizepoint*\goldenratio*1.2}pt}
+\def\largerfontheight{\fpeval{\normalfontsizepoint*\goldenratio*1.2*\goldenratio}pt}
 
-\def\largestfontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio}pt}
-\def\largestfontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio}pt}
+\def\largestfontsize{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio}pt}
+\def\largestfontheight{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio*\goldenratio}pt}
 
-\def\hugefontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio*1.2}pt}
-\def\hugefontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*1.2*\goldenratio}pt}
+\def\hugefontsize{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio*1.2}pt}
+\def\hugefontheight{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio*1.2*\goldenratio}pt}
 
-\def\hugestfontsize{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio}pt}
-\def\hugestfontheight{\fpeval{\normalfontsize*\goldenratio*\goldenratio*\goldenratio*\goldenratio}pt}
+\def\hugestfontsize{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio*\goldenratio}pt}
+\def\hugestfontheight{\fpeval{\normalfontsizepoint*\goldenratio*\goldenratio*\goldenratio*\goldenratio}pt}
+
+\def\descriptorfontsize{\fpeval{\normalfontsizepoint-1}pt}
+\def\descriptorfontheight{\fpeval{(\normalfontsizepoint-1)*\goldenratio}pt}
+
+\def\locationfontsize{\fpeval{\normalfontsizepoint-2}pt}
+\def\locationfontheight{\fpeval{(\normalfontsizepoint-2)*\goldenratio}pt}

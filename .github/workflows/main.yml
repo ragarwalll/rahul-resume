@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  actions: read
+  pull-requests: write
+  contents: read
+
 jobs:
   latex:
     uses: ./.github/workflows/reusable-ci.yml

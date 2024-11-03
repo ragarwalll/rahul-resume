@@ -42,51 +42,36 @@ jobs:
             texlive-full \
             chktex
 
-      # Ensure texmf is properly initialized after cache restore
-      - name: Initialize texmf
-        if: steps.cache-apt.outputs.cache-hit == 'true'
-        run: |
-          sudo mktexlsr
-          sudo texhash
-
-      # Cache CPAN modules with better path handling
+      # Cache CPAN modules
       - name: Cache CPAN modules
         id: cpan-cache
         uses: actions/cache@v3
         with:
-          path: |
-            ~/perl5
-            ~/.cpanm
-          key: ${{ runner.os }}-cpan-${{ hashFiles('**/cpanfile') }}-v1
+          path: ~/perl5
+          key: ${{ runner.os }}-cpan-${{ hashFiles('**/cpanfile') }}
           restore-keys: |
             ${{ runner.os }}-cpan-
 
-      # Set up Perl environment before any CPAN operations
-      - name: Set up Perl environment
+      # Install Perl and CPAN dependencies
+      - name: Install Perl and CPAN dependencies (if cache miss)
+        if: steps.cpan-cache.outputs.cache-hit != 'true'
         run: |
-          echo "PERL_LOCAL_LIB_ROOT=$HOME/perl5" >> $GITHUB_ENV
-          echo "PERL_MB_OPT=--install_base '$HOME/perl5'" >> $GITHUB_ENV
-          echo "PERL_MM_OPT=INSTALL_BASE=$HOME/perl5" >> $GITHUB_ENV
-          echo "PERL5LIB=$HOME/perl5/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
-          echo "PATH=$HOME/perl5/bin:$PATH" >> $GITHUB_ENV
-
-      # Install Perl and CPAN dependencies if cache miss
-      - name: Install Perl and CPAN dependencies
-        # if: steps.cpan-cache.outputs.cache-hit != 'true'
-        run: |
+          # Install modules to local directory
           cpanm --local-lib=~/perl5 local::lib
           eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+
+          # Install dependencies with cache
           cpanm --notest Log::Log4perl
           cpanm --notest YAML::Tiny
           cpanm --notest File::HomeDir
           cpanm --notest Unicode::GCString
 
-      # Verify LaTeX installation
-      - name: Verify LaTeX installation
+      # Always set up Perl environment
+      - name: Set up Perl environment
         run: |
-          which xelatex
-          xelatex --version
-          kpsewhich article.cls
+          eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+          echo "PERL5LIB=$HOME/perl5/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
+          echo "PATH=$HOME/perl5/bin:$PATH" >> $GITHUB_ENV
 
       # Verification and processing steps
       - name: Find and validate config files
@@ -212,28 +197,15 @@ jobs:
           fi
 
       - name: Build PDF with XeLaTeX
-        id: build-pdf
         working-directory: ${{ inputs.working_directory }}
         run: |
-          # Print LaTeX environment info
-          echo "LaTeX environment:"
-          tex --version
-          echo "TEXMFHOME: $TEXMFHOME"
-          echo "TEXMFVAR: $TEXMFVAR"
-
-          # Clean any existing auxiliary files
-          rm -f *.aux *.log *.out *.pdf
-
-          # Run latexmk with increased verbosity
           latexmk -xelatex \
             -interaction=nonstopmode \
             -file-line-error \
-            -verbose \
             ${{ inputs.main_document }}
 
       - name: Upload PDF artifact
         id: upload_pdf
-        if: steps.build-pdf.conclusion == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: pdf-output
@@ -246,14 +218,12 @@ jobs:
           FORMAT_ERRORS: ${{ steps.format.outputs.format_errors }}
           LINT_ERRORS: ${{ steps.lint.outputs.lint_errors }}
           LINT_WARNINGS: ${{ steps.lint.outputs.lint_warnings }}
-          PDF_EXIT_CONCLUSION: ${{ steps.build-pdf.conclusion }}
         run: |
           # Start with a header
-          #print pdf build code
           echo "# 📑 LaTeX Build Report" >> $GITHUB_STEP_SUMMARY
 
           # Add status banner
-          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
+          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ]; then
             echo "### ✅ Build Status: Successful" >> $GITHUB_STEP_SUMMARY
           else
             echo "### ❌ Build Status: Failed" >> $GITHUB_STEP_SUMMARY
@@ -264,13 +234,6 @@ jobs:
           echo "| Metric | Count | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Total Files Processed | ${{ steps.find-tex.outputs.file_count }} | ℹ️ |" >> $GITHUB_STEP_SUMMARY
-
-          # Add formatting status with emoji
-          if [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
-            echo "| PDF Build | - | ✅ |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| PDF Build Issue | 1 | ❌ |" >> $GITHUB_STEP_SUMMARY
-          fi
 
           # Add formatting status with emoji
           if [ "$FORMAT_ERRORS" = "0" ]; then
@@ -293,7 +256,7 @@ jobs:
           fi
 
           # Add artifact information if build succeeded
-          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
+          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "## 📋 Build Artifacts" >> $GITHUB_STEP_SUMMARY
             echo "✅ PDF has been generated successfully" >> $GITHUB_STEP_SUMMARY
@@ -301,7 +264,7 @@ jobs:
           fi
 
           # Add note about errors if any
-          if [ "$FORMAT_ERRORS" != "0" ] || [ "$LINT_ERRORS" != "0" ] || [ "$LINT_WARNINGS" != "0" ] || [ "$PDF_EXIT_CONCLUSION" != "success" ]; then
+          if [ "$FORMAT_ERRORS" != "0" ] || [ "$LINT_ERRORS" != "0" ] || [ "$LINT_WARNINGS" != "0" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "## ⚠️ Issues Found" >> $GITHUB_STEP_SUMMARY
             echo "Please check the workflow logs for detailed error messages and fix the following:" >> $GITHUB_STEP_SUMMARY
@@ -317,14 +280,10 @@ jobs:
             if [ "$LINT_WARNINGS" != "0" ]; then
               echo "- ⚠️ Address linting warnings in $LINT_WARNINGS files" >> $GITHUB_STEP_SUMMARY
             fi
-
-            if [ "$PDF_EXIT_CONCLUSION" != "success" ]; then
-              echo "- ❌ PDF generation failed due to an error" >> $GITHUB_STEP_SUMMARY
-            fi
           fi
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -332,19 +291,18 @@ jobs:
             const formatErrors = parseInt('${{ steps.format.outputs.format_errors }}') || 0;
             const lintErrors = parseInt('${{ steps.lint.outputs.lint_errors }}') || 0;
             const lintWarnings = parseInt('${{ steps.lint.outputs.lint_warnings }}') || 0;
-            const buildPdfFailed = '${{ steps.build-pdf.conclusion }}' === 'failure' ? 1 : 0;
 
+            const artifactUrl = '${{ steps.upload_pdf.outputs.artifact-url }}';
             let status = '✅ Build Successful';
             let color = '0E8A16'; // green
             let details = '';
 
-            if (formatErrors > 0 || lintErrors > 0 || lintWarnings > 0 || buildPdfFailed > 0) {
+            if (formatErrors > 0 || lintErrors > 0 || lintWarnings > 0) {
               status = '❌ Build Failed';
               color = 'D93F0B'; // red
               details = `
               ### Build Statistics
               - Total files processed: ${{ steps.find-tex.outputs.file_count }}
-              - PDF generation status: ${buildPdfFailed ? 'Failed' : 'Successful'}
               - Files with formatting issues: ${formatErrors}
               - Files with lint errors: ${lintErrors}
               - Files with lint warnings: ${lintWarnings}
@@ -352,11 +310,10 @@ jobs:
               Please check the workflow logs for detailed error messages.
               `;
             } else {
-              const artifactUrl = '${{ steps.upload_pdf.outputs.artifact-url }}';
               details = `
-              ### 📄 PDF has been generated successfully!
+              ### 📄 PDF artifact has been generated successfully!
               
-              🔗 [Download PDF](${artifactUrl})
+              🔗 [Download PDF Artifact](${artifactUrl})
               
               ### Build Statistics
               - Total files processed: ${{ steps.find-tex.outputs.file_count }}
@@ -401,7 +358,7 @@ jobs:
             }
 
       - name: Upload logs on failure
-        if: ${{ failure() || steps.build-pdf.conclusion == 'failure' }}
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: latex-logs

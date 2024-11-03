@@ -1,0 +1,33 @@
+% chktex-file 1
+% cmd/process-data.tex - A XeLaTeX template snippet to process the data
+
+\def\onecolumn{\detokenize{onecolumn}}
+\def\novalue{\detokenize{}}
+
+\newcommand{\displayprofilelinks}{
+  \def\currentlinkurl{\getexpandablevalue{\parseJSONKey\JSONParseArrayKeyII}}
+  \href{\currentlinkurl}{\JSONParseArrayValueI} |
+}
+
+\newcommand{\processdata}{
+  % ===================== Process Layout =====================
+  \def\layout{\getexpandablevalue{layout}}
+
+  \ifnum\pdfstrcmp{\layout}{\onecolumn}=0
+    \def\goldenleft{1}
+    \def\goldenright{1}
+  \fi
+
+  % ===================== Process Name =====================
+  \def\firstName{\getexpandablevalue{firstName}}
+  \def\lastName{\getvalue{lastName}}
+
+  \def\middleName{\getexpandablevalue{middleName}}
+  \ifnum\pdfstrcmp{\middleName}{\novalue}=0
+    \def\middleName{}
+  \else
+    \def\firstName{\getvalue{firstName} \middleName}
+  \fi
+
+  % ===================== Process Profile Links =====================
+}

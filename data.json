@@ -1,0 +1,28 @@
+{
+  "layout": "column",
+  "title": "My Title",
+  "firstName": "Rahul",
+  "middleName": "",
+  "lastName": "Agarwal",
+  "links": {
+    "line1": [
+      {
+        "icon": "",
+        "text": "github/ragarwalll",
+        "href": "https://github.com/ragarwalll"
+      },
+      {
+        "icon": "",
+        "text": "linkedin/ragarwalll",
+        "href": "https://www.linkedin.com/in/ragarwalll  "
+      }
+    ],
+    "line2": [
+      {
+        "icon": "",
+        "text": "agarwal.rahul324@gmail.com",
+        "href": "mailto:agarwal.rahul324@gmail.com"
+      }
+    ]
+  }
+}

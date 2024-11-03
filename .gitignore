@@ -7,3 +7,5 @@ resume.aux
 node_modules
 resume.fdb_latexmk
 *.pdf
+out.tex
+resume_data.jsonparse

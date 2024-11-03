@@ -1,0 +1,11 @@
+% chktex-file 1
+% cmd/json-processor.tex - A XeLaTeX template snippet to process JSON data
+
+\newcommand{\getvalue}[1]{\JSONParseValue{\data}{#1}}
+\newcommand{\getexpandablevalue}[1]{\JSONParseExpandableValue{\data}{#1}}
+
+\newcommand{\parseJSON}[3]{%
+  \def\parseJSONKey{#1}%  Store the key
+  \JSONParseArrayValuesMap{\data}{#1}[#2]{#3}%
+  \def\parseJSONKey{}%  Clear the key
+}

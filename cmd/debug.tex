@@ -2,69 +2,99 @@
 % chktex-file 1
 
 \newcommand{\debug}{
-  % use the gray color that we defined earlier
-  =====Printing Debug Information=====\\
+  % Header
+  \noindent\rule{\textwidth}{0.4pt}
+  \begin{center}\textbf{=====Printing Debug Information=====}\end{center}
+  \noindent\rule{\textwidth}{0.4pt}
 
-  ===Default Fonts=== \\
-  Thin Font: \thinfont \\
-  Extra Light Font: \extralightfont \\
-  Light Font: \lightfont \\
-  Default Font: \defaultfont \\
-  Medium Font: \mediumfont \\
-  Semibold Font: \semiboldfont \\
-  Bold Font: \boldfont \\
-  Extra Bold Font: \extraboldfont \\\\
+  % Font Information Section using minipage
+  \begin{center}\large\textbf{Font Information}\end{center}
+  \noindent
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Default Fonts}
+    \begin{itemize}
+      \item Thin: \thinfont
+      \item Extra Light: \extralightfont
+      \item Light: \lightfont
+      \item Default: \defaultfont
+      \item Medium: \mediumfont
+      \item Semibold: \semiboldfont
+      \item Bold: \boldfont
+      \item Extra Bold: \extraboldfont
+    \end{itemize}
+  \end{minipage}%
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Resume Fonts}
+    \begin{itemize}
+      \item Main: \mainfont
+      \item Sans: \sansfont
+      \item First Name: \firstnamefont
+      \item Last Name: \lastnamefont
+      \item Profile Links: \profilelinksfont
+      \item Last Updated: \lastupdatedfont
+      \item Section: \sectionfont
+      \item Subsection: \subsectionfont
+      \item Descriptor: \infofont
+      \item Location: \additionalinfofont
+    \end{itemize}
+  \end{minipage}%
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Font Size Information}
+    \begin{itemize}
+      \item Golden Ratio: \goldenratio
+      \item Tiny: \tinyfontsize (\tinyfontheight)
+      \item Script: \scriptfontsize (\scriptfontheight)
+      \item Footnote: \footnotefontsize (\footnotefontheight)
+      \item Small: \smallfontsize (\smallfontheight)
+      \item Normal: \normalfontsize (\normalfontheight)
+      \item Large: \largefontsize (\largefontheight)
+      \item Larger: \largerfontsize (\largerfontheight)
+      \item Largest: \largestfontsize (\largestfontheight)
+      \item Huge: \hugefontsize (\hugefontheight)
+      \item Hugest: \hugestfontsize (\hugestfontheight)
+    \end{itemize}
+  \end{minipage}
 
-  ===Resume Fonts=== \\
-  Main Font: \mainfont \\
-  Sans Font: \sansfont \\
-  First Name Font: \firstnamefont \\
-  Last Name Font: \lastnamefont \\
-  Profile Links Font: \profilelinksfont \\
-  Last Updated Font: \lastupdatedfont \\
-  Section Font: \sectionfont \\
-  Subsection Font: \subsectionfont \\
-
-  ===Default Font Path=== \\
-  Thin Font Path: \thinfontpath \\
-  Extra Light Font Path: \extralightfontpath \\
-  Light Font Path: \lightfontpath \\
-  Default Font Path: \defaultfontpath \\
-  Medium Font Path: \mediumfontpath \\
-  Semibold Font Path: \semiboldfontpath \\
-  Bold Font Path: \boldfontpath \\
-  Extra Bold Font Path: \extraboldfontpath \\\\
-
-  ===Resume Fonts Path=== \\
-  Main Font Path: \mainfontpath \\
-  Sans Font Path: \sansfontpath \\
-  First Name Font Path: \firstnamefontpath \\
-  Last Name Font Path: \lastnamefontpath \\
-  Profile Links Font Path: \profilelinksfontpath \\
-  Last Updated Font Path: \lastupdatedfontpath \\
-  Section Font Path: \sectionfontpath \\
-  Subsection Font Path: \subsectionfontpath \\
-
-  ===Font Size=== \\
-  Golden Ratio: \goldenratio \\
-  Tiny Font Size: \tinyfontsize \\
-  Tiny Font Height: \tinyfontheight \\
-  Script Font Size: \scriptfontsize \\
-  Script Font Height: \scriptfontheight \\
-  Footnote Font Size: \footnotefontsize \\
-  Footnote Font Height: \footnotefontheight \\
-  Small Font Size: \smallfontsize \\
-  Small Font Height: \smallfontheight \\
-  Normal Font Size: \normalfontsize \\
-  Normal Font Height: \normalfontheight \\
-  Large Font Size: \largefontsize \\
-  Large Font Height: \largefontheight \\
-  Larger Font Size: \largerfontsize \\
-  Larger Font Height: \largerfontheight \\
-  Largest Font Size: \largestfontsize \\
-  Largest Font Height: \largestfontheight \\
-  Huge Font Size: \hugefontsize \\
-  Huge Font Height: \hugefontheight \\
-  Hugest Font Size: \hugestfontsize \\
-  Hugest Font Height: \hugestfontheight
+  \vspace{1em}
+  % Font Paths Section
+  \begin{center}\large\textbf{Font Paths}\end{center}
+  \noindent
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Default Font Paths}
+    \begin{itemize}
+      \item Thin: \thinfontpath
+      \item Extra Light: \extralightfontpath
+      \item Light: \lightfontpath
+      \item Default: \defaultfontpath
+      \item Medium: \mediumfontpath
+      \item Semibold: \semiboldfontpath
+      \item Bold: \boldfontpath
+      \item Extra Bold: \extraboldfontpath
+    \end{itemize}
+  \end{minipage}%
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Resume Font Paths}
+    \begin{itemize}
+      \item Main: \mainfontpath
+      \item Sans: \sansfontpath
+      \item First Name: \firstnamefontpath
+      \item Last Name: \lastnamefontpath
+      \item Profile Links: \profilelinksfontpath
+      \item Last Updated: \lastupdatedfontpath
+      \item Section: \sectionfontpath
+      \item Subsection: \subsectionfontpath
+      \item Descriptor: \infofontpath
+      \item Location: \additionalinfofontpath
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}[t]{0.33\textwidth}
+    \textbf{Colors}
+    \begin{itemize}
+      \item datecolor: \datecolor
+      \item primarycolor: \primarycolor
+      \item headingscolor: \headingscolor
+      \item subheadingscolor: \subheadingscolor
+    \end{itemize}
+  \end{minipage}
+  \noindent\rule{\textwidth}{0.4pt}
 }

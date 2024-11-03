@@ -1,5 +1,6 @@
 % chktex-file 44
 % chktex-file 27
+
 % resume.cls - A class file for LaTeX to create a resume    
 % @author: ragarwalll
 % @inspired by: deedy
@@ -57,6 +58,17 @@
 % This command loads the 'isodate' package with formatting for UK English dates
 \usepackage[UKenglish]{isodate}
 
+% This command loads the 'jsonparse' package which provides JSON support
+\usepackage{jsonparse}
+
+% This command loads the 'trimspaces' package which provides support for trimming spaces
+\usepackage{trimspaces}
+
+\usepackage{calc}
+
+% This command loads the 'csvsimple-json` package which provides CSV and JSON support'
+% \usepackage{jsonparse}
+
 % enable the following
 % system fonts (TTF/OTF)
 % Extra features for XeLaTeX
@@ -76,10 +88,17 @@
   \input{modifiers/colors.tex}
   \input{modifiers/fonts.tex}
   \input{modifiers/sections.tex}
+  \input{modifiers/sub-sections.tex}
 
   % load the custom commands
   \input{cmd/last-updated.tex}
   \input{cmd/name-section.tex}
+  \input{cmd/alt-sub-section.tex}
+  \input{cmd/into.tex}
+  \input{cmd/additional-info.tex}
+  \input{cmd/json-processor.tex}
+  \input{cmd/trim-spaces.tex}
+  \input{cmd/process-data.tex}
 
 }
 

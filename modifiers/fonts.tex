@@ -5,21 +5,18 @@
 % #FontDefinitions
 % These commands work with XeLaTeX to use system-installed fonts directly rather than traditional LaTeX fonts.
 % Sets default features for all fonts
-\defaultfontfeatures{
-  Ligatures=TeX,
-  Scale=1.0
-}
+\defaultfontfeatures{Mapping=tex-text}
 
 % Sets the main font for the document
 \ifx\mainfontpath\empty
   \setmainfont[\defaultmainfontoptions, \mainfontoptions]{\mainfont}
 \else
-  \setmainfont[\defaultmainfontoptions, \mainfontoptions, Path = \mainfontpath]{\mainfont}
+  \setmainfont[\defaultmainfontoptions, Path = \mainfontpath, \mainfontoptions]{\mainfont}
 \fi
 
 % Sets the sans-serif font
 \ifx\sansfontpath\empty
-  \setmainfont[\defaultsansfontoptions, \sansfontoptions]{\sansfont}
+  \setsansfont[\defaultsansfontoptions, \sansfontoptions]{\sansfont}
 \else
-  \setmainfont[\defaultsansfontoptions, \sansfontoptions, Path = \sansfontpath]{\sansfont}
+  \setsansfont[\defaultsansfontoptions, \sansfontoptions, Path = \sansfontpath]{\sansfont}
 \fi

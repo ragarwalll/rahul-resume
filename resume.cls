@@ -38,42 +38,49 @@
 \LoadClass{article}
 
 % This command loads the 'geometry' package with the specified options
-\usepackage[hmargin=1.25cm, vmargin=0.7cm]{geometry}
+\RequirePackage[hmargin=1.25cm, vmargin=0.7cm]{geometry}
 
 % This command loads the 'xcolor' package with the specified options
-\usepackage[usenames,dvipsnames]{xcolor}
+\RequirePackage[usenames,dvipsnames]{xcolor}
 
 % Load the 'hyperref' package with normal looking text as the link
-\usepackage[hidelinks]{hyperref}
+\RequirePackage[hidelinks]{hyperref}
 
 % This command loads the 'titlesec' package with the custom formatting for the sections
-\usepackage{titlesec}
+\RequirePackage{titlesec}
 
 % This command loads the 'textpos' package which will allow text to be positioned at an absolute position on the page
-\usepackage[absolute]{textpos}
+\RequirePackage[absolute]{textpos}
 
 % This command loads the 'babel' package with formatting for UK English
-\usepackage[UKenglish]{babel}
+\RequirePackage[UKenglish]{babel}
 
 % This command loads the 'isodate' package with formatting for UK English dates
-\usepackage[UKenglish]{isodate}
+\RequirePackage[UKenglish]{isodate}
 
 % This command loads the 'jsonparse' package which provides JSON support
-\usepackage{jsonparse}
+\RequirePackage{kvoptions}
+\RequirePackage{jsonparse}
+\RequirePackage{jsonparse}
 
 % This command loads the 'trimspaces' package which provides support for trimming spaces
-\usepackage{trimspaces}
+\RequirePackage{trimspaces}
 
-\usepackage{calc}
-
+\RequirePackage{calc}
 % This command loads the 'csvsimple-json` package which provides CSV and JSON support'
-% \usepackage{jsonparse}
+\RequirePackage{etoolbox}
+\RequirePackage{setspace}
+
+% \renewcommand\section[1]{%
+%   \par\vspace{1em}%
+%   {\large\bfseries #1}\par\vspace{0.5em}%
+%  }
 
 % enable the following
 % system fonts (TTF/OTF)
 % Extra features for XeLaTeX
 % Provides Unicode support
-\usepackage{fontspec,xltxtra,xunicode}
+\RequirePackage{fontspec,xltxtra,xunicode}
 
 % This command loads the 'xfp' package which provides floating point operations
 \RequirePackage{xfp}
@@ -89,12 +96,14 @@
   \input{modifiers/fonts.tex}
   \input{modifiers/sections.tex}
   \input{modifiers/sub-sections.tex}
+  \input{modifiers/tightemize.tex}
 
   % load the custom commands
   \input{cmd/last-updated.tex}
   \input{cmd/name-section.tex}
   \input{cmd/alt-sub-section.tex}
-  \input{cmd/into.tex}
+  \input{cmd/section-seperator.tex}
+  \input{cmd/info.tex}
   \input{cmd/additional-info.tex}
   \input{cmd/json-processor.tex}
   \input{cmd/trim-spaces.tex}

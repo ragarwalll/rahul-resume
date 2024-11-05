@@ -1,0 +1,16 @@
+% chktex-file 1
+% cmd/into.tex - A XeLaTeX template snippet to format the infomartion
+
+\newcommand{\info}[1]{%
+  \color{subheadings}%
+  \raggedright%
+  \scshape%
+  \ifx\infofontpath\empty%
+    \fontspec{\infofont}%
+  \else%
+    \fontspec[Path = \infofontpath]{\infofont}%
+  \fi%
+  \fontsize{\infofontsize}{\infofontheight}%
+  \selectfont {#1 \\}%
+  \normalfont%
+}%

@@ -1,16 +1,16 @@
 % chktex-file 1
 % cmd/additionalinfo.tex - A XeLaTeX template snippet to format the additional information
 
-\newcommand{\additionalinfo}[1]{
-  \color{headings}
-  \raggedright
-  \scshape
-  \ifx\additionalinfofontpath\empty
-    \fontspec{\additionalinfofont}
-  \else
-    \fontspec[Path = \additionalinfofontpath]{\additionalinfofont}
-  \fi
-  \fontsize{\additionalinfofontsize}{\additionalinfofontheight}
-  \selectfont {#1\\}
-  \normalfont
-}
+\newcommand{\additionalinfo}[1]{%
+  \color{headings}%
+  \raggedright%
+  \scshape%
+  \ifx\additionalinfofontpath\empty%
+    \fontspec{\additionalinfofont}%
+  \else%
+    \fontspec[Path = \additionalinfofontpath]{\additionalinfofont}%
+  \fi%
+  \fontsize{\additionalinfofontsize}{\additionalinfofontheight}%
+  \selectfont {#1\\}%
+  \normalfont%
+}%

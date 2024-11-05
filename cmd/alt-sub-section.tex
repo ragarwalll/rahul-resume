@@ -1,16 +1,16 @@
 % chktex-file 1
 % cmd/alt-sub-section.tex - A XeLaTeX template snippet to format the alt sub-sections pointers
 
-\newcommand{\altsubsection}[1]{    % Creates a new command named \runsubsection that takes 1 argument
-  \color{subheadings}              % Sets the text color to a predefined 'subheadings' color
-  \ifx\subsectionfontpath\empty
-    \fontspec{\subsectionfont}
-  \else
-    \fontspec[Path = \subsectionfontpath]{\subsectionfont}
-  \fi
-  \fontsize{\normalfontsize}{\normalfontheight}   % Sets font size to 12pt with 12pt line spacing
-  \selectfont                      % Activates the font settings specified above
-  \bfseries                        % Makes the text bold
-  \uppercase {#1}                  % Converts the argument (#1) to uppercase
-  \normalfont                      % Returns the font to normal style after the section
-}
+\newcommand{\altsubsection}[1]{%    % Creates a new command named \runsubsection that takes 1 argument
+  \color{subheadings}%              % Sets the text color to a predefined 'subheadings' color
+  \ifx\subsectionfontpath\empty%
+    \fontspec{\subsectionfont}%
+  \else%
+    \fontspec[Path = \subsectionfontpath]{\subsectionfont}%
+  \fi%
+  \fontsize{\normalfontsize}{\normalfontheight}%   % Sets font size to 12pt with 12pt line spacing
+  \selectfont%                      % Activates the font settings specified above
+  \bfseries%                        % Makes the text bold
+  \uppercase {#1}%                  % Converts the argument (#1) to uppercase
+  \normalfont%                      % Returns the font to normal style after the section
+}%

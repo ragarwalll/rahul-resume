@@ -1,6 +1,5 @@
 {
-  "layout": "column",
-  "title": "My Title",
+  "layout": "twocolumn",
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
@@ -9,20 +8,156 @@
       {
         "icon": "",
         "text": "github/ragarwalll",
-        "href": "https://github.com/ragarwalll"
+        "href": "https://github.com/ragarwalll",
+        "addSeparator": true
       },
       {
         "icon": "",
         "text": "linkedin/ragarwalll",
-        "href": "https://www.linkedin.com/in/ragarwalll  "
+        "href": "https://www.linkedin.com/in/ragarwalll",
+        "addSeparator": false
       }
     ],
     "line2": [
       {
         "icon": "",
         "text": "agarwal.rahul324@gmail.com",
-        "href": "mailto:agarwal.rahul324@gmail.com"
+        "href": "mailto:agarwal.rahul324@gmail.com",
+        "addSeparator": false
       }
     ]
-  }
+  },
+  "sections": [
+    {
+      "type": "experience",
+      "title": "Experience",
+      "subsections": [
+        {
+          "roles": [
+            "Software Engineer",
+            "Core Search Quality",
+            "Knowledge Engine"
+          ],
+          "company": "Google",
+          "location": "Redmond, WA",
+          "timeline": "July 2019 - Present",
+          "description": [
+            {
+              "text": [
+                {
+                  "value": "Machine Learning and infrastructure for query understanding, Knowledge Engine triggering, and ranking on Google Search in mostly"
+                },
+                {
+                  "value": "C++, Python.",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "roles": ["Software Engineer", "Place Search Ranking"],
+          "company": "Facebook",
+          "location": "Redmond, WA",
+          "timeline": "May 2018 - August 2018",
+          "description": [
+            {
+              "text": [
+                {
+                  "value": "Primarily a data, backend and machine learning engineer. Managed an intern, conducted interviews, and involved in on-campus recruiting"
+                }
+              ]
+            },
+            {
+              "text": [
+                {
+                  "value": "Projects: hours of operation prediction framework in"
+                },
+                {
+                  "value": "Hive, Python",
+                  "bold": true
+                }
+              ]
+            },
+            {
+              "text": [
+                {
+                  "value": "GeoLocation prediction in PHP, Hive, Python"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "roles": ["KPCB Fellow", "Software Engineering Intern"],
+          "company": "Coursera",
+          "location": "Redmond, WA",
+          "timeline": "May 2017 - August 2017",
+          "description": [
+            {
+              "text": [
+                {
+                  "value": "Full-stack developer - Wrote and reviewed code for JS using Backbone, Jade, Stylus and Require and Scala using Play"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "roles": ["Software Engineering Intern", "YouTube Captions"],
+          "company": "Google",
+          "location": "Redmond, WA",
+          "timeline": "May 2016 - August 2016",
+          "description": [
+            {
+              "text": [
+                {
+                  "value": "Designed and develop a full stack method to add and edit Automatic Speech Recognition captions in Python and JS. Shipped globally."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "roles": ["Open Source Contributor", "Team Leader"],
+          "company": "Fabricator",
+          "location": "Redmond, WA",
+          "timeline": "May 2016 - August 2016",
+          "description": [
+            {
+              "text": [
+                {
+                  "value": "Phabricator is used daily by Facebook, Dropbox, Quora, Asana and more."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Research",
+      "subsection": []
+    },
+    {
+      "title": "Publications",
+      "subsection": []
+    },
+    {
+      "title": "Education",
+      "subsection": []
+    },
+    {
+      "title": "Links",
+      "subsection": []
+    },
+    {
+      "title": "Coursework",
+      "subsection": []
+    },
+    {
+      "title": "Skills",
+      "subsection": []
+    }
+  ]
 }

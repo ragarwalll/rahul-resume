@@ -9,3 +9,4 @@ resume.fdb_latexmk
 *.pdf
 out.tex
 resume_data.jsonparse
+resume.xdv

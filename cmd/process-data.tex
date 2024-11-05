@@ -4,13 +4,9 @@
 \def\onecolumn{\detokenize{onecolumn}}
 \def\novalue{\detokenize{}}
 
-\newcommand{\displayprofilelinks}{
-  \def\currentlinkurl{\getexpandablevalue{\parseJSONKey\JSONParseArrayKeyII}}
-  \href{\currentlinkurl}{\JSONParseArrayValueI} |
-}
-
+% ===================== Process Data =====================
 \newcommand{\processdata}{
-  % ===================== Process Layout =====================
+
   \def\layout{\getexpandablevalue{layout}}
 
   \ifnum\pdfstrcmp{\layout}{\onecolumn}=0
@@ -28,6 +24,103 @@
   \else
     \def\firstName{\getvalue{firstName} \middleName}
   \fi
+}
 
-  % ===================== Process Profile Links =====================
+% ===================== Process Profile Links =====================
+\newcommand{\displayprofilelinks}{
+  % get the current link url
+  \def\currentlinkurl{\getexpandablevalue{\parseJSONKey\JSONParseArrayKeyII}}%
+  %
+  % get the status of the separator
+  \def\showSeperator{\getexpandablevalue{\parseJSONKey\JSONParseArrayKeyIII}}%
+  %
+  % show the href
+  \href{\currentlinkurl}{\JSONParseArrayValueI}%
+  %
+  % show the separator
+  \ifnum\pdfstrcmp{\showSeperator}{\detokenize{true}}=0%
+    |%
+  \fi%
+}
+
+% ===================== Process Section =====================
+\newcommand{\displaysections}{%
+  \begingroup
+  \edef\sectiontitle{\getexpandablevalue{\parseJSONKey\JSONParseArrayKeyI}}%
+  \edef\subsectionspath{\parseJSONKey[\JSONParseArrayIndex].subsections}%
+  \section{\sectiontitle}%
+  \expandafter\callSafeParseJSON\expandafter{\subsectionspath}{company,roles}{displaysubsections}%
+  \endgroup
+}
+
+% ===================== Process Subsections =====================
+\newcommand{\displaysubsections}{%
+  \begingroup
+  \altsubsection{\JSONParseArrayValueI}%
+  \displayroles{\parseJSONKey[\JSONParseArrayIndex].roles}%
+  \displayadditionalinfo{\parseJSONKey[\JSONParseArrayIndex]}%
+  \displaydescription{\parseJSONKey[\JSONParseArrayIndex]}%
+  \sectionseperator%
+  \endgroup
+}
+
+% ===================== Process Roles =====================
+\newcommand{\displayroles}[1]{%
+  \def\rolesasarray{\getexpandablevalue{#1}}%
+  \ifnum\pdfstrcmp{\rolesasarray}{\detokenize{}}=0%
+    \info{}
+  \else
+    \info{| \expandafter\prettifyJSON\expandafter{#1}{, }}%
+  \fi%
+}
+
+% ===================== Process Additional Info =====================
+\newcommand{\displayadditionalinfo}[1]{%
+  \def\dateval{\getexpandablevalue{#1.timeline}}%
+  \def\locationval{\getexpandablevalue{#1.location}}%
+  \ifnum\pdfstrcmp{\dateval}{\detokenize{}}=0%
+    \ifnum\pdfstrcmp{\locationval}{\detokenize{}}>0%
+      % Only location exists
+      \additionalinfo{\locationval}%
+    \fi
+  \else
+    \ifnum\pdfstrcmp{\locationval}{\detokenize{}}=0%
+      % Only date exists
+      \additionalinfo{\dateval}%
+    \else
+      % Both exist
+      \additionalinfo{\dateval\space|\space\locationval}%
+    \fi
+  \fi
+}
+
+% ===================== Process Description =====================
+\newcommand{\displaydescription}[1]{%
+  \edef\displayeachdescriptionpath{#1.description}%
+  \expandafter\callSafeParseJSON\expandafter{\displayeachdescriptionpath}{text}{displayeachdescription}%
+}
+
+\newcommand{\displayeachdescription}{%
+  {\setstretch{1}
+      \begingroup
+      \edef\perdescriptionpath{\parseJSONKey[\JSONParseArrayIndex].text}%
+      \begin{tightemize}
+        \item \expandafter\callSafeParseJSON\expandafter{\perdescriptionpath}{value,bold}{displayeachdescriptiontext}%
+      \end{tightemize}
+      \endgroup
+    }
+}
+
+\newcommand{\displayeachdescriptiontext}{%
+  \def\perdescriptiontextpath{\parseJSONKey[\JSONParseArrayIndex].value}%
+  \def\perboldtextpath{\parseJSONKey[\JSONParseArrayIndex].bold}%
+  %
+  \def\perdescriptiontextval{\getexpandablevalue{\perdescriptiontextpath}}%
+  \def\perboldtextval{\getexpandablevalue{\perboldtextpath}}%
+  %  
+  \ifnum\pdfstrcmp{\perboldtextval}{\detokenize{true}}=0%
+    \textbf{\space\perdescriptiontextval}
+  \else
+    \perdescriptiontextval
+  \fi%
 }

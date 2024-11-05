@@ -1,19 +1,18 @@
-name: main
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-permissions:
-  actions: read
-  pull-requests: write
-  contents: read
-
+name: Build LaTeX document
+on: [push]
 jobs:
-  latex:
-    uses: ./.github/workflows/reusable-ci.yml
-    with:
-      main_document: resume.tex
-      working_directory: "." # Root directory
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v4
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: resume.tex
+          latexmk_use_xelatex: true
+      - name: Upload PDF file
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF
+          path: resume.pdf

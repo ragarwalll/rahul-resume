@@ -1,35 +1,32 @@
 % !TEX engine = xelatex
-
+%
 % ===================================== Metadata =====================================
 % Use the resume.cls as the documentclass
-\documentclass[]{resume}
-
+\documentclass[]{resume}%
+%
 % Use the fancyhdr package to have custom headers and footers
-\usepackage{fancyhdr}
-
+\usepackage{fancyhdr}%
+%
 % Set the pagestyle to fancy, i.e. custom headers and footers
-\pagestyle{fancy}
-
+\pagestyle{fancy}%
+%
 % apply presets
-\loadpresent{deedy-inspired}
-
+\loadpresent{deedy-inspired-open-fonts}%
+%
 % Set the right footer to the page number
-\rfoot{Page \thepage{}\hspace{1pt}}
-
+\rfoot{Page \thepage{}\hspace{1pt}}%
+%
 % load the data files
-\JSONParseFromFile[externalize=false]{\data}{data.json}
-
+\JSONParseFromFile[externalize=false]{\data}{data.json}%
+%
 % ===================================== Document =====================================
-
+%
 % Begin the document
-\begin{document}
-
+\begin{document}%
+%
 % Process the data
-\processdata{}
-
-% \debug{}
-
-
+\processdata{}%
+%
 % Use the custom last updated command to display the last updated date
 % Page
 % +------------------------------------------------>
@@ -39,45 +36,35 @@
 % |                                   | Updated    |
 % |                                   +------------+
 % |
-\lastupdated{}
-
+\lastupdated{}%
+%
 % ================================== Name Section ===================================
-
+%
 % add the name and contact information
 %       RAHUL AGARWAL                    
-
+%
 %       xxxxx | xxxx
 %    xxx | xxx | xxxx
 % _________________________________________________
-
-\namesection{\firstName}{\lastName}{
-  \urlstyle{same}
-  \parseJSON{links.line1}{text,href}{displayprofilelinks}\\
-  \parseJSON{links.line2}{text,href}{displayprofilelinks}
-}
+%
+\namesection{\firstName}{\lastName}{%
+	\urlstyle{same}%
+	\safeParseJSON{links.line1}{text,href,addSeparator}{displayprofilelinks}\\%
+	\safeParseJSON{links.line2}{text,href,addSeparator}{displayprofilelinks}%
+}%
 
 % Then use them in your minipages
-\noindent
-\begin{minipage}[t]{\goldenleft\textwidth}
-  % Left content (larger)
-  \section{Experience}
-  \altsubsection{SAP}
-  \info{| Software Engineer }
-  \additionalinfo{Jan 2015 Present | New York, NY}
-
-  \section{Experience}
-  College of Engineering \
-  Magna Cum Laude
-  \altsubsection{Facebook}
-  College of Engineering \\
-  Magna Cum Laude
+\noindent%
+\begin{minipage}[t]{\goldenleft\textwidth}%
+	\safeParseJSON{sections}{title,subsections}{displaysections}%
+	%
 \end{minipage}%
 \hfill%
-\begin{minipage}[t]{\goldenright\textwidth}
-  \section{Education}
-  College of Engineering \\
-  Magna Cum Laude
-\end{minipage}
-
+\begin{minipage}[t]{\goldenright\textwidth}%
+	\section{Education}%
+	College of Engineering \\%
+	Magna Cum Laude%
+\end{minipage}%
+%
 % End the document
-\end{document}
+\end{document}%

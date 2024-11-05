@@ -1,19 +1,19 @@
 % cmd/last-updated.tex: Definition of command \lastupdated
 % chktex-file 1
 
-\newcommand{\lastupdated}{\begin{textblock}{60} (160,0)
+\newcommand{\lastupdated}{\begin{textblock}{60} (160,0)%
     % use the gray color that we defined earlier
-    \color{date}
-    \ifx\lastupdatedfontpath\empty
-      \fontspec{\lastupdatedfont}
-    \else
-      \fontspec[Path = \lastupdatedfontpath]{\lastupdatedfont}
-    \fi
-    \fontsize{\smallfontsize}{\smallfontheight}
-    \selectfont
+    \color{date}%
+    \ifx\lastupdatedfontpath\empty%
+      \fontspec{\lastupdatedfont}%
+    \else%
+      \fontspec[Path = \lastupdatedfontpath]{\lastupdatedfont}%
+    \fi%
+    \fontsize{\smallfontsize}{\smallfontheight}%
+    \selectfont%
     % set the date to today
-    Last Updated on
-    \today
+    Last Updated on%
+    \today%
     % end the text block
-  \end{textblock}
-}
+  \end{textblock}%
+}%

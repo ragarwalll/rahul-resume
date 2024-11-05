@@ -3,9 +3,22 @@
 
 \newcommand{\getvalue}[1]{\JSONParseValue{\data}{#1}}
 \newcommand{\getexpandablevalue}[1]{\JSONParseExpandableValue{\data}{#1}}
+\def\parseJSONKey{}
 
-\newcommand{\parseJSON}[3]{%
-  \def\parseJSONKey{#1}%  Store the key
+\newcommand{\prettifyJSON}[2]{%
+  \begingroup%
+  \JSONParseArrayValues{\data}{#1}{#2}%
+  \endgroup%
+}
+
+\newcommand{\safeParseJSON}[3]{%
+  \begingroup%
+  % Store the current value of parseJSONKey
+  \def\parseJSONKey{#1}%
   \JSONParseArrayValuesMap{\data}{#1}[#2]{#3}%
-  \def\parseJSONKey{}%  Clear the key
+  \endgroup%
+}
+
+\newcommand{\callSafeParseJSON}[3]{%
+  \safeParseJSON{#1}{#2}{#3}%
 }

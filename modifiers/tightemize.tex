@@ -1,0 +1,10 @@
+% modifiers/tightemize.tex - Tighten the itemize environment
+
+\newenvironment{tightemize}{
+  \vspace{-\topsep}
+  \begin{itemize}
+    \itemsep1pt        % space between items
+    \parskip0pt        % space between paragraphs
+    \parsep0pt         % space between paragraphs and items
+    }
+    {\end{itemize}\vspace{-\topsep}}

@@ -1,0 +1,16 @@
+% modifiers/tightnopoints.tex - Tighten the itemize with no points environment
+
+\newenvironment{tightnopoints}{
+  \vspace{-\topsep}
+  \begin{itemize}[
+      noitemsep,
+      wide,
+      label={},
+      leftmargin=0pt,
+      itemindent=0pt,    % removes indentation of item
+      labelwidth=0pt,    % width of the label area
+      labelsep=0pt,      % space between label and text
+      align=left         % aligns text to the left
+    ]
+    }
+    {\end{itemize}\vspace{-\topsep}}

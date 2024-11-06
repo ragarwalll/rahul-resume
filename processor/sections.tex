@@ -1,0 +1,70 @@
+
+\def\hasMultipleColumns{false}%
+\def\currentProcessingSection{}%
+
+\newcommand{\displaysections}{%
+  \safeParseJSON{resume.sections}{column}{validatemulticolumnlayout}%
+  %
+  \ifnum\pdfstrcmp{\hasMultipleColumns}{\detokenize{true}}=0%
+    \columnratio{0.618}%
+    \begin{paracol}{2}%
+      \begin{leftcolumn}%
+        \gdef\currentProcessingSection{1}%
+        \safeParseJSON{resume.sections}{heading,column}{processsection}%
+      \end{leftcolumn}%
+      \begin{rightcolumn}%
+        \gdef\currentProcessingSection{2}%
+        \safeParseJSON{resume.sections}{heading,column}{processsection}%
+      \end{rightcolumn}%
+    \end{paracol}%
+  \else%
+    \safeParseJSON{resume.sections}{heading}{processsection}%
+  \fi%
+}%
+
+\newcommand{\validatemulticolumnlayout}{%
+  \edef\multicolumnkey{\parseJSONKey[\JSONParseArrayIndex].column}%
+  \def\multikey{\getexpandablevalue{\multicolumnkey}}%
+  \ifnum\pdfstrcmp{\multikey}{\detokenize{2}}=0%
+    \gdef\hasMultipleColumns{true}%
+  \fi%
+}%
+
+\newcommand{\processsection}{%
+  %====================== Section ======================
+  % check if currentProcessingSection is not empty then only process the section
+  \edef\currentSection{\parseJSONKey[\JSONParseArrayIndex]}%
+  \ifnum\pdfstrcmp{\currentProcessingSection}{}=0%
+    \processsections{\currentSection}%
+  \else
+    \edef\multicolumnkey{\parseJSONKey\JSONParseArrayKeyII}%
+    \def\multikey{\getexpandablevalue{\multicolumnkey}}%
+    \ifnum\pdfstrcmp{\multikey}{\currentProcessingSection}=0
+      \processsections{\currentSection}%
+    \else
+      \ifnum\pdfstrcmp{\currentProcessingSection}{\detokenize{1}}=0
+        \ifnum\pdfstrcmp{\multikey}{\detokenize{}}=0
+          \processsections{\currentSection}%
+        \fi
+      \fi
+    \fi
+  \fi
+}%
+
+\newcommand{\processsections}[1]{%
+  \noindent\begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+    \sloppy
+    \begingroup
+    %
+    % show the section title
+    \sectionseperator%
+    \section{\processvalueforkey{#1.heading}}%
+    %
+    % prepare subsection path
+    \edef\subsectionspath{#1.subsections}%
+    %
+    % process the subsections   
+    \processsubsection{\subsectionspath}%
+    \endgroup
+  \end{minipage}
+}%

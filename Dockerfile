@@ -26,10 +26,10 @@ FROM debian:bullseye-slim
 COPY --from=builder /usr/local/texlive /usr/local/texlive
 
 # Add TeX Live binaries to PATH
-ENV PATH="/usr/local/texlive/2024/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/2024/bin/aarch64-linux:${PATH}"
 
 # Verify installation
-RUN which tlmgr
+RUN tlmgr --version
 
 # Set working directory
 WORKDIR /workspace

@@ -1,0 +1,20 @@
+% processor/process-inline-list.tex - This file is responsible for processing inline lists. It is a part of the processor module.
+
+\newcommand{\processinlinelist}[1]{%
+  \edef\seperatorval{\textbullet{}}%
+  \edef\inlinelistitemskey{#1.items}%
+  \edef\inlinelistseperatorkey{#1.separator}%
+  %
+  \edef\listitems{\getexpandablevalue{\inlinelistitemskey}}%  
+  \edef\listseperator{\getexpandablevalue{\inlinelistseperatorkey}}%
+  %
+  \ifnum\pdfstrcmp{\listseperator}{\detokenize{}}>0%
+    \ifnum\pdfstrcmp{\listseperator}{\detokenize{•}}>0%
+      \edef\seperatorval{\listseperator}%
+    \fi%
+  \fi%
+  \ifnum\pdfstrcmp{\listitems}{\detokenize{}}>0%
+    \expandafter\prettifyJSON\expandafter{\inlinelistitemskey}{\space\listseperator\space}%
+    \newline%
+  \fi%
+}%

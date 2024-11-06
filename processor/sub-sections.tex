@@ -1,0 +1,15 @@
+\def\showBullets{false}
+
+\newcommand{\processsubsection}[1]{%
+  \expandafter\callSafeParseJSON\expandafter{#1}{heading}{processsubsections}%
+}%
+
+\newcommand{\processsubsections}{%
+  \begingroup%
+  \edef\subsectionkey{\parseJSONKey[\JSONParseArrayIndex]}%
+  \altsubsection{\processvalueforkey{\parseJSONKey\JSONParseArrayKeyI}}%
+  \displayinfo{\subsectionkey.info}%
+  \displaymetadata{\subsectionkey.metadata}%
+  \displaycontent{\subsectionkey.content}%
+  \endgroup%
+}%

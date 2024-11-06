@@ -41,10 +41,10 @@
 \RequirePackage[hmargin=1.25cm, vmargin=0.7cm]{geometry}
 
 % This command loads the 'xcolor' package with the specified options
-\RequirePackage[usenames,dvipsnames]{xcolor}
+\RequirePackage[dvipsnames]{xcolor}
 
 % Load the 'hyperref' package with normal looking text as the link
-\RequirePackage[hidelinks]{hyperref}
+\RequirePackage[hidelinks,bookmarks=true]{hyperref}
 
 % This command loads the 'titlesec' package with the custom formatting for the sections
 \RequirePackage{titlesec}
@@ -59,22 +59,17 @@
 \RequirePackage[UKenglish]{isodate}
 
 % This command loads the 'jsonparse' package which provides JSON support
-\RequirePackage{kvoptions}
-\RequirePackage{jsonparse}
 \RequirePackage{jsonparse}
 
-% This command loads the 'trimspaces' package which provides support for trimming spaces
-\RequirePackage{trimspaces}
-
-\RequirePackage{calc}
-% This command loads the 'csvsimple-json` package which provides CSV and JSON support'
-\RequirePackage{etoolbox}
+% This command loads the setspace` package which provides line spacing commands
 \RequirePackage{setspace}
 
-% \renewcommand\section[1]{%
-%   \par\vspace{1em}%
-%   {\large\bfseries #1}\par\vspace{0.5em}%
-%  }
+% This command loads the 'enumitem' package which provides list formatting
+\RequirePackage{enumitem}
+
+% This command loads the 'paracol' package which provides multi-column formatting
+\RequirePackage{paracol}
+
 
 % enable the following
 % system fonts (TTF/OTF)
@@ -97,6 +92,7 @@
   \input{modifiers/sections.tex}
   \input{modifiers/sub-sections.tex}
   \input{modifiers/tightemize.tex}
+  \input{modifiers/tightnopoints.tex}
 
   % load the custom commands
   \input{cmd/last-updated.tex}
@@ -107,8 +103,20 @@
   \input{cmd/additional-info.tex}
   \input{cmd/json-processor.tex}
   \input{cmd/trim-spaces.tex}
-  \input{cmd/process-data.tex}
 
+  \input{processor/header.tex}
+  \input{processor/main.tex}
+  \input{processor/sections.tex}
+  \input{processor/sub-sections.tex}
+  \input{processor/display-info.tex}
+  \input{processor/display-metadata.tex}
+  \input{processor/display-content.tex}
+  \input{processor/process-inline-list.tex}
+  \input{processor/process-list.tex}
+  \input{processor/process-paragraph.tex}
+  \input{processor/process-segments.tex}
+  \input{processor/process-text.tex}
+  \input{processor/utils.tex}
 }
 
 % Command to load present

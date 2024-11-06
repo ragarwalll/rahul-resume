@@ -17,15 +17,12 @@
 \rfoot{Page \thepage{}\hspace{1pt}}%
 %
 % load the data files
-\JSONParseFromFile[externalize=false]{\data}{data.json}%
+\JSONParseFromFile[externalize=true]{\data}{data.json}%
 %
 % ===================================== Document =====================================
 %
 % Begin the document
 \begin{document}%
-%
-% Process the data
-\processdata{}%
 %
 % Use the custom last updated command to display the last updated date
 % Page
@@ -38,33 +35,6 @@
 % |
 \lastupdated{}%
 %
-% ================================== Name Section ===================================
-%
-% add the name and contact information
-%       RAHUL AGARWAL                    
-%
-%       xxxxx | xxxx
-%    xxx | xxx | xxxx
-% _________________________________________________
-%
-\namesection{\firstName}{\lastName}{%
-	\urlstyle{same}%
-	\safeParseJSON{links.line1}{text,href,addSeparator}{displayprofilelinks}\\%
-	\safeParseJSON{links.line2}{text,href,addSeparator}{displayprofilelinks}%
-}%
-
-% Then use them in your minipages
-\noindent%
-\begin{minipage}[t]{\goldenleft\textwidth}%
-	\safeParseJSON{sections}{title,subsections}{displaysections}%
-	%
-\end{minipage}%
-\hfill%
-\begin{minipage}[t]{\goldenright\textwidth}%
-	\section{Education}%
-	College of Engineering \\%
-	Magna Cum Laude%
-\end{minipage}%
-%
+\buildresume%
 % End the document
 \end{document}%

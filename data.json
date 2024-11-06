@@ -1,163 +1,363 @@
 {
-  "layout": "twocolumn",
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
-  "links": {
-    "line1": [
-      {
-        "icon": "",
-        "text": "github/ragarwalll",
-        "href": "https://github.com/ragarwalll",
-        "addSeparator": true
-      },
-      {
-        "icon": "",
-        "text": "linkedin/ragarwalll",
-        "href": "https://www.linkedin.com/in/ragarwalll",
-        "addSeparator": false
-      }
-    ],
-    "line2": [
-      {
-        "icon": "",
-        "text": "agarwal.rahul324@gmail.com",
-        "href": "mailto:agarwal.rahul324@gmail.com",
-        "addSeparator": false
-      }
-    ]
-  },
-  "sections": [
-    {
-      "type": "experience",
-      "title": "Experience",
-      "subsections": [
+  "resume": {
+    "layout": {
+      "columns": [
         {
-          "roles": [
-            "Software Engineer",
-            "Core Search Quality",
-            "Knowledge Engine"
-          ],
-          "company": "Google",
-          "location": "Redmond, WA",
-          "timeline": "July 2019 - Present",
-          "description": [
-            {
-              "text": [
-                {
-                  "value": "Machine Learning and infrastructure for query understanding, Knowledge Engine triggering, and ranking on Google Search in mostly"
-                },
-                {
-                  "value": "C++, Python.",
-                  "bold": true
-                }
-              ]
-            }
-          ]
+          "width": 0.3,
+          "sections": ["education", "languages"]
         },
         {
-          "roles": ["Software Engineer", "Place Search Ranking"],
-          "company": "Facebook",
-          "location": "Redmond, WA",
-          "timeline": "May 2018 - August 2018",
-          "description": [
-            {
-              "text": [
-                {
-                  "value": "Primarily a data, backend and machine learning engineer. Managed an intern, conducted interviews, and involved in on-campus recruiting"
-                }
-              ]
-            },
-            {
-              "text": [
-                {
-                  "value": "Projects: hours of operation prediction framework in"
-                },
-                {
-                  "value": "Hive, Python",
-                  "bold": true
-                }
-              ]
-            },
-            {
-              "text": [
-                {
-                  "value": "GeoLocation prediction in PHP, Hive, Python"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "roles": ["KPCB Fellow", "Software Engineering Intern"],
-          "company": "Coursera",
-          "location": "Redmond, WA",
-          "timeline": "May 2017 - August 2017",
-          "description": [
-            {
-              "text": [
-                {
-                  "value": "Full-stack developer - Wrote and reviewed code for JS using Backbone, Jade, Stylus and Require and Scala using Play"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "roles": ["Software Engineering Intern", "YouTube Captions"],
-          "company": "Google",
-          "location": "Redmond, WA",
-          "timeline": "May 2016 - August 2016",
-          "description": [
-            {
-              "text": [
-                {
-                  "value": "Designed and develop a full stack method to add and edit Automatic Speech Recognition captions in Python and JS. Shipped globally."
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "roles": ["Open Source Contributor", "Team Leader"],
-          "company": "Fabricator",
-          "location": "Redmond, WA",
-          "timeline": "May 2016 - August 2016",
-          "description": [
-            {
-              "text": [
-                {
-                  "value": "Phabricator is used daily by Facebook, Dropbox, Quora, Asana and more."
-                }
-              ]
-            }
-          ]
+          "width": 0.7,
+          "sections": ["experience", "research"]
         }
       ]
     },
-    {
-      "title": "Research",
-      "subsection": []
-    },
-    {
-      "title": "Publications",
-      "subsection": []
-    },
-    {
-      "title": "Education",
-      "subsection": []
-    },
-    {
-      "title": "Links",
-      "subsection": []
-    },
-    {
-      "title": "Coursework",
-      "subsection": []
-    },
-    {
-      "title": "Skills",
-      "subsection": []
-    }
-  ]
+    "sections": [
+      {
+        "id": "experience",
+        "heading": "EXPERIENCE",
+        "columnSettings": 1,
+        "subsections": [
+          {
+            "heading": "COURSERA",
+            "info": {
+              "title": "KPCB Fellow + Software Engineering Intern",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Expected June 2014 - Sep 2014",
+              "location": "Mountain View, CA"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": true,
+                "spacing": "normal"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "52 out of 2500 applicants chosen to be a KPCB Fellow 2014."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "heading": "GOOGLE",
+            "info": {
+              "title": "Software Engineering Intern",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "May 2013 - Aug 2013",
+              "location": "Mountain View, CA"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": true,
+                "spacing": "normal"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Worked on the YouTube Captions team in primarily vanilla Javascript and Python to plan, design and develop the full stack implementation of a new framework to add and edit Automatic Speech Recognition captions."
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Created a backbone.js-like framework for the Captions editor."
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "All code was reviewed, perfected, and pushed to production."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "heading": "PHABRICATOR",
+            "info": {
+              "title": "Open Source Contributor & Team Leader",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Jan 2013 - May 2013",
+              "location": "Palo Alto, CA & Ithaca, NY"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": true,
+                "spacing": "normal"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Phabricator is used daily by Facebook, Dropbox, Quora, Asana and more."
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "I created the Meme generator, the entire Lipsum application, ported Tokens to different apps, fixed many bugs and more in PHP and Shell."
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Led team from MIT, Cornell, IC London and UHelsinki for the project."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "research",
+        "heading": "RESEARCH",
+        "column": 1,
+        "columnSettings": 1,
+        "subsections": [
+          {
+            "heading": "CORNELL ROBOT LEARNING LAB",
+            "info": {
+              "title": "Head Undergrad Research",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Jan 2014 - Present",
+              "location": "Ithaca, NY"
+            },
+            "content": {
+              "type": "paragraph",
+              "style": {
+                "spacing": "normal"
+              },
+              "text": "Worked with Ashesh Jain and Prof Ashutosh Saxena to create PlanIt, a tool which learns from large scale user preference feedback to plan robot trajectories in human environments. Publication submitted."
+            }
+          },
+          {
+            "heading": "CORNELL PHONETICS LAB",
+            "info": {
+              "title": "Head Undergraduate Researcher",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Mar 2012 - May 2013",
+              "location": "Ithaca, NY"
+            },
+            "content": {
+              "type": "paragraph",
+              "style": {
+                "spacing": "normal"
+              },
+              "text": "Lead the development of QuickTongue, the first ever breakthrough tongue-controlled game with Prof Sam Tilsen to aid in Linguistics research. Publication submitted."
+            }
+          }
+        ]
+      },
+      {
+        "id": "education",
+        "heading": "EDUCATION",
+        "column": 2,
+        "columnSettings": 1,
+        "subsections": [
+          {
+            "heading": "CORNELL UNIVERSITY",
+            "info": {
+              "title": "MEng in Computer Science",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Expected Dec 2014",
+              "location": "Ithaca, NY"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": false,
+                "spacing": "compact"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Cum. GPA: N/A"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "heading": "CORNELL UNIVERSITY",
+            "info": {
+              "title": "BS in Computer Science",
+              "sameLine": true
+            },
+            "metadata": {
+              "duration": "Expected May 2014",
+              "location": "Ithaca, NY"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": false,
+                "spacing": "compact"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Conc. in Software Engineering, College of Engineering"
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Dean's List (All Semesters)"
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Cum. GPA: 3.92/4.0"
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Major GPA: 3.94/4.0"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "languages",
+        "heading": "LANGUAGES",
+        "column": 2,
+        "columnSettings": 2,
+        "subsections": [
+          {
+            "heading": "PROGRAMMING",
+            "columnSettings": 1,
+            "info": {
+              "title": "Languages"
+            },
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": false,
+                "spacing": "compact"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Over 5000 lines:"
+                    }
+                  ],
+                  "inlineList": {
+                    "separator": "•",
+                    "items": [
+                      "Java",
+                      "Shell",
+                      "JavaScript",
+                      "Matlab",
+                      "OCaml",
+                      "Python",
+                      "Rails",
+                      "LaTeX"
+                    ]
+                  }
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Over 1000 lines:"
+                    }
+                  ],
+                  "inlineList": {
+                    "separator": "•",
+                    "items": ["C", "C++", "CSS", "PHP", "Assembly"]
+                  }
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Familiar:"
+                    }
+                  ],
+                  "inlineList": {
+                    "separator": "•",
+                    "items": ["AS3", "iOS", "Android", "MySQL"]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "heading": "SPOKEN & WRITTEN",
+            "columnSettings": 1,
+            "content": {
+              "type": "list",
+              "style": {
+                "showBullets": false,
+                "spacing": "compact"
+              },
+              "items": [
+                {
+                  "segments": [
+                    {
+                      "text": "Native fluency: "
+                    },
+                    {
+                      "text": "English, Spanish"
+                    }
+                  ]
+                },
+                {
+                  "segments": [
+                    {
+                      "text": "Reading fluency: "
+                    },
+                    {
+                      "text": "Chinese, Japanese"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
 }

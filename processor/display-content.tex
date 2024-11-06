@@ -1,0 +1,12 @@
+% processor/display-content.tex - Display content processor
+
+\newcommand{\displaycontent}[1]{%
+  \def\typevalue{\getexpandablevalue{#1.type}}%
+  \ifnum\pdfstrcmp{\typevalue}{\detokenize{list}}=0
+    \processlist{#1}%
+  \else%
+    \ifnum\pdfstrcmp{\typevalue}{\detokenize{paragraph}}=0
+      \processparagraph{#1}%
+    \fi%
+  \fi%
+}%

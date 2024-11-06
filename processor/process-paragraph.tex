@@ -1,0 +1,8 @@
+% processor/process-paragraph.tex - Process a paragraph
+
+\newcommand{\processparagraph}[1]{%
+  \def\textvalue{\getexpandablevalue{#1.text}}%
+  \begin{tightnopoints}%
+    \item \textvalue%
+  \end{tightnopoints}%
+}%

@@ -1,0 +1,8 @@
+% processor/process-text.tex - A snippet from the processor that processes text content.
+
+\newcommand{\processtext}{%
+  \def\textpath{\parseJSONKey[\JSONParseArrayIndex].text}%
+  %
+  \def\textval{\getexpandablevalue{\textpath}}%
+  \textval%
+}%

@@ -1,0 +1,19 @@
+
+\newcommand{\displaymetadata}[1] {
+  \def\durationvalue{\getexpandablevalue{#1.duration}}%
+  \def\locationvalue{\getexpandablevalue{#1.location}}%
+  \ifnum\pdfstrcmp{\durationvalue}{\detokenize{}}=0%
+    \ifnum\pdfstrcmp{\locationvalue}{\detokenize{}}>0%
+      % Only location exists
+      \additionalinfo{\locationvalue}%
+    \fi
+  \else
+    \ifnum\pdfstrcmp{\locationvalue}{\detokenize{}}=0%
+      % Only date exists
+      \additionalinfo{\durationvalue}%
+    \else
+      % Both exist
+      \additionalinfo{\durationvalue\space|\space\locationvalue}%
+    \fi
+  \fi
+}

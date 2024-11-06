@@ -1,0 +1,13 @@
+
+\newcommand{\displayinfo}[1] {
+  \def\sameLine{\getexpandablevalue{#1.sameLine}}%
+  \def\titlevalue{\getexpandablevalue{#1.title}}%
+  \ifnum\pdfstrcmp{\sameLine}{\detokenize{true}}=0%
+    \info{\space|\space\titlevalue}%
+  \else%
+    \newline%
+    \ifnum\pdfstrcmp{\titlevalue}{\detokenize{}}>0%
+      \info{\titlevalue}%
+    \fi
+  \fi%
+}

@@ -1,0 +1,36 @@
+% processor/header.tex - Header for the processor
+
+\def\novalue{\detokenize{}}
+
+% ===================== Process Data =====================
+\newcommand{\processdata}{
+  % ===================== Process Name =====================
+  \def\firstName{\getexpandablevalue{firstName}}
+  \def\lastName{\getvalue{lastName}}
+
+  \def\middleName{\getexpandablevalue{middleName}}
+  \ifnum\pdfstrcmp{\middleName}{\novalue}=0
+    \def\middleName{}
+  \else
+    \def\firstName{\getvalue{firstName} \middleName}
+  \fi
+}
+
+\newcommand{\displayheader}{
+  \processdata
+  \def\lastname{\getvalue{lastName}}%
+  %
+  \def\middlename{\getexpandablevalue{middleName}}%
+  \ifnum\pdfstrcmp{\middlename}{\novalue}=0%
+    \def\middlename{}%
+  \else%
+    \def\firstName{\getvalue{firstName}\space\middlename}%
+  \fi%
+  %
+  \namesection{\firstName}{\lastname}{
+    \urlstyle{same}%
+    % TODO: Add links here
+    %   \safeParseJSON{links.line1}{text,href,addSeparator}{displayprofilelinks}\\%
+    %   \safeParseJSON{links.line2}{text,href,addSeparator}{displayprofilelinks}%
+  }
+}%

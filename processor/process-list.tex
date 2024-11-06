@@ -1,0 +1,7 @@
+% processor/process-list.tex - Provides the \processlist command to process a list of items.
+
+\newcommand{\processlist}[1]{%
+  \def\showbulletsvalue{\getexpandablevalue{#1.style.showBullets}}%
+  \gdef\showBullets{\showbulletsvalue}%
+  \expandafter\callSafeParseJSON\expandafter{#1.items}{segments}{processsegments}%
+}%

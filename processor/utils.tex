@@ -1,0 +1,10 @@
+% processor/utils.tex - Utility functions for the processor
+
+\newcommand{\processvalueforkey}[1]{%
+  \edef\valueforkey{\getexpandablevalue{#1}}%
+  \valueforkey%
+}%
+
+\newcommand{\ifstreq}[2]{%
+  \ifnum\pdfstrcmp{#1}{#2}=0 \expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi%
+}%

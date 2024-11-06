@@ -1,0 +1,21 @@
+% processor/process-segments.tex - Process segments
+
+\newcommand{\processsegments}{%
+  {\setstretch{1}%
+      \begingroup%
+      \edef\segmentkey{\parseJSONKey[\JSONParseArrayIndex].segments}%
+      \edef\inlinelistkey{\parseJSONKey[\JSONParseArrayIndex].inlineList}%
+      %
+      \ifnum\pdfstrcmp{\showBullets}{\detokenize{false}}=0%
+        \begin{tightnopoints}%
+          \item \expandafter\callSafeParseJSON\expandafter{\segmentkey}{text}{processtext}%
+        \end{tightnopoints}%
+      \else%
+        \begin{tightemize}%
+          \item \expandafter\callSafeParseJSON\expandafter{\segmentkey}{text}{processtext}%
+        \end{tightemize}%
+      \fi%
+      \processinlinelist{\inlinelistkey}%
+      \endgroup%
+    }%
+}%

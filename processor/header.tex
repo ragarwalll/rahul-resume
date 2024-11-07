@@ -17,7 +17,7 @@
 }
 
 \newcommand{\displayheader}{
-  \processdata
+  \processdata%
   \def\lastname{\getvalue{lastName}}%
   %
   \def\middlename{\getexpandablevalue{middleName}}%
@@ -29,8 +29,5 @@
   %
   \namesection{\firstName}{\lastname}{
     \urlstyle{same}%
-    % TODO: Add links here
-    %   \safeParseJSON{links.line1}{text,href,addSeparator}{displayprofilelinks}\\%
-    %   \safeParseJSON{links.line2}{text,href,addSeparator}{displayprofilelinks}%
-  }
+  }%
 }%

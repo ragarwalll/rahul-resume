@@ -1,120 +1,119 @@
-% modifiers/default-fonts.tex - Set the default fonts for the document
-% chktex-file 1
-
-% ===========Default Fonts===========
-\ifx\mainfont\empty
-  \def\mainfont{\lightfont}
-\fi
-
-\ifx\extralightfont\empty
-  \def\extralightfont{\lightfont}
-\fi
-
-\ifx\firstnamefont\empty
-  \def\firstnamefont{\thinfont}
-\fi
-
-\ifx\lastnamefont\empty
-  \def\lastnamefont{\lightfont}
-\fi
-
-\ifx\lastupdatedfont\empty
-  \def\lastupdatedfont{\extralightfont}
-\fi
-
-\ifx\sectionfont\empty
-  \def\sectionfont{\lightfont}
-\fi
-
-\ifx\subsectionfont\empty
-  \def\subsectionfont{\boldfont}
-\fi
-
-\ifx\profilelinksfont\empty
-  \def\profilelinksfont{\mediumfont}
-\fi
-
-\ifx\infofont\empty
-  \def\infofont{\mediumfont}
-\fi
-
-\ifx\additionalinfofont\empty
-  \def\additionalinfofont{\mediumfont}
-\fi
-
-% ===========Default Fonts Path===========
-\ifx\fontpath\empty
-  % Path is empty, use system font
-\else
-  \ifx\thinfontpath\empty
-    \def\thinfontpath{\fontpath}
-  \fi
-
-  \ifx\extralightfontpath\empty
-    \def\extralightfontpath{\fontpath}
-  \fi
-
-  \ifx\lightfontpath\empty
-    \def\lightfontpath{\fontpath}
-  \fi
-
-  \ifx\defaultfontpath\empty
-    \def\defaultfontpath{\fontpath}
-  \fi
-
-  \ifx\mediumfontpath\empty
-    \def\mediumfontpath{\fontpath}
-  \fi
-
-  \ifx\semiboldfontpath\empty
-    \def\semiboldfontpath{\fontpath}
-  \fi
-
-  \ifx\boldfontpath\empty
-    \def\boldfontpath{\fontpath}
-  \fi
-
-  \ifx\extraboldfontpath\empty
-    \def\extraboldfontpath{\fontpath}
-  \fi
-
-  \ifx\mainfontpath\empty
-    \def\mainfontpath{\fontpath}
-  \fi
-
-  \ifx\sansfontpath\empty
-    \def\sansfontpath{\fontpath}
-  \fi
-
-  \ifx\firstnamefontpath\empty
-    \def\firstnamefontpath{\fontpath}
-  \fi
-
-  \ifx\lastnamefontpath\empty
-    \def\lastnamefontpath{\fontpath}
-  \fi
-
-  \ifx\lastupdatedfontpath\empty
-    \def\lastupdatedfontpath{\fontpath}
-  \fi
-
-  \ifx\sectionfontpath\empty
-    \def\sectionfontpath{\fontpath}
-  \fi
-
-  \ifx\subsectionfontpath\empty
-    \def\subsectionfontpath{\fontpath}
-  \fi
-
-  \ifx\profilelinksfontpath\empty
-    \def\profilelinksfontpath{\fontpath}
-  \fi
-
-  \ifx\infofontpath\empty
-    \def\infofontpath{\fontpath}
-  \fi
-
-  \ifx\additionalinfofontpath\empty
-    \def\additionalinfofontpath{\fontpath}
-  \fi
-\fi
+% modifiers/default-fonts.tex - Set the default fonts for the document%
+%
+% ===========Default Fonts===========%
+\ifx\mainfont\empty%
+  \def\mainfont{\lightfont}%
+\fi%
+%
+\ifx\extralightfont\empty%
+  \def\extralightfont{\lightfont}%
+\fi%
+%
+\ifx\firstnamefont\empty%
+  \def\firstnamefont{\thinfont}%
+\fi%
+%
+\ifx\lastnamefont\empty%
+  \def\lastnamefont{\lightfont}%
+\fi%
+%
+\ifx\lastupdatedfont\empty%
+  \def\lastupdatedfont{\extralightfont}%
+\fi%
+%
+\ifx\sectionfont\empty%
+  \def\sectionfont{\lightfont}%
+\fi%
+%
+\ifx\subsectionfont\empty%
+  \def\subsectionfont{\boldfont}%
+\fi%
+%
+\ifx\profilelinksfont\empty%
+  \def\profilelinksfont{\mediumfont}%
+\fi%
+%
+\ifx\infofont\empty%
+  \def\infofont{\mediumfont}%
+\fi%
+%
+\ifx\additionalinfofont\empty%
+  \def\additionalinfofont{\mediumfont}%
+\fi%
+%
+% ===========Default Fonts Path===========%
+\ifx\fontpath\empty%
+  % Path is empty, use system font%
+\else%
+  \ifx\thinfontpath\empty%
+    \def\thinfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\extralightfontpath\empty%
+    \def\extralightfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\lightfontpath\empty%
+    \def\lightfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\defaultfontpath\empty%
+    \def\defaultfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\mediumfontpath\empty%
+    \def\mediumfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\semiboldfontpath\empty%
+    \def\semiboldfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\boldfontpath\empty%
+    \def\boldfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\extraboldfontpath\empty%
+    \def\extraboldfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\mainfontpath\empty%
+    \def\mainfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\sansfontpath\empty%
+    \def\sansfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\firstnamefontpath\empty%
+    \def\firstnamefontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\lastnamefontpath\empty%
+    \def\lastnamefontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\lastupdatedfontpath\empty%
+    \def\lastupdatedfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\sectionfontpath\empty%
+    \def\sectionfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\subsectionfontpath\empty%
+    \def\subsectionfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\profilelinksfontpath\empty%
+    \def\profilelinksfontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\infofontpath\empty%
+    \def\infofontpath{\fontpath}%
+  \fi%
+  %
+  \ifx\additionalinfofontpath\empty%
+    \def\additionalinfofontpath{\fontpath}%
+  \fi%
+\fi%

@@ -60,11 +60,14 @@
     \sectionseperator%
     \section{\processvalueforkey{#1.heading}}%
     %
-    % prepare subsection path
-    \edef\subsectionspath{#1.subsections}%
-    %
     % process the subsections   
-    \processsubsection{\subsectionspath}%
+    \processsubsection{#1}%
+    %
+    % prepare content path
+    \edef\sectioncontentpath{#1.content}%
+    %
+    % process the content
+    \displaycontent{\sectioncontentpath}%
     \endgroup
   \end{minipage}
 }%

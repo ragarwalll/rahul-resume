@@ -10,3 +10,4 @@ resume.fdb_latexmk
 out.tex
 resume_data.jsonparse
 resume.xdv
+resume.synctex(busy)

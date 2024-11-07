@@ -70,6 +70,8 @@
 % This command loads the 'paracol' package which provides multi-column formatting
 \RequirePackage{paracol}
 
+% This command loads the 'ulem' package which provides underline formatting
+\RequirePackage{ulem}
 
 % enable the following
 % system fonts (TTF/OTF)
@@ -79,6 +81,10 @@
 
 % This command loads the 'xfp' package which provides floating point operations
 \RequirePackage{xfp}
+
+% This command loads the 'multicol' package which provides multi-column formatting
+\RequirePackage{multicol}
+
 
 % Command to apply all settings
 \newcommand{\applysettings}{
@@ -131,7 +137,6 @@
   \input{modifiers/default-fonts.tex}
   \input{cmd/debug.tex}
   \applysettings{}
-
 }
 
 % Command to override specific settings

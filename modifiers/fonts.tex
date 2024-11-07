@@ -1,22 +1,21 @@
-% chktex-file 44
-% chktex-file 1
-% modifiers/fonts.tex - Set the font to use in the XeLaTeX document
-
-% #FontDefinitions
-% These commands work with XeLaTeX to use system-installed fonts directly rather than traditional LaTeX fonts.
-% Sets default features for all fonts
-\defaultfontfeatures{Mapping=tex-text}
-
-% Sets the main font for the document
-\ifx\mainfontpath\empty
-  \setmainfont[\defaultmainfontoptions, \mainfontoptions]{\mainfont}
-\else
-  \setmainfont[\defaultmainfontoptions, Path = \mainfontpath, \mainfontoptions]{\mainfont}
-\fi
-
-% Sets the sans-serif font
-\ifx\sansfontpath\empty
-  \setsansfont[\defaultsansfontoptions, \sansfontoptions]{\sansfont}
-\else
-  \setsansfont[\defaultsansfontoptions, \sansfontoptions, Path = \sansfontpath]{\sansfont}
-\fi
+% chktex-file 44%
+% modifiers/fonts.tex - Set the font to use in the XeLaTeX document%
+%
+% #FontDefinitions%
+% These commands work with XeLaTeX to use system-installed fonts directly rather than traditional LaTeX fonts.%
+% Sets default features for all fonts%
+\defaultfontfeatures{Mapping=tex-text}%
+%
+% Sets the main font for the document%
+\ifx\mainfontpath\empty%
+  \setmainfont[\defaultmainfontoptions, \mainfontoptions]{\mainfont}%
+\else%
+  \setmainfont[\defaultmainfontoptions, Path = \mainfontpath, \mainfontoptions]{\mainfont}%
+\fi%
+%
+% Sets the sans-serif font%
+\ifx\sansfontpath\empty%
+  \setsansfont[\defaultsansfontoptions, \sansfontoptions]{\sansfont}%
+\else%
+  \setsansfont[\defaultsansfontoptions, \sansfontoptions, Path = \sansfontpath]{\sansfont}%
+\fi%

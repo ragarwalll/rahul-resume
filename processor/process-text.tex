@@ -1,8 +1,56 @@
 % processor/process-text.tex - A snippet from the processor that processes text content.
 
 \newcommand{\processtext}{%
-  \def\textpath{\parseJSONKey[\JSONParseArrayIndex].text}%
+  \def\boldmodifier{}%
+  \def\italicmodifier{}%
+  \def\underlinemodifier{}%
+  \def\hrefmodifier{}%
+  \def\typemodifier{}%
   %
+  \def\textpath{\parseJSONKey[\JSONParseArrayIndex].text}%
+  \def\hrefpath{\parseJSONKey[\JSONParseArrayIndex].href}%
+  \def\stylepath{\parseJSONKey[\JSONParseArrayIndex].style}%
+  %
+  % process for style value
+  \def\isbold{\getexpandablevalue{\stylepath.bold}}%
+  \def\isitalic{\getexpandablevalue{\stylepath.italic}}%
+  \def\isunderline{\getexpandablevalue{\stylepath.underline}}%
+  \def\hastypemodifier{\getexpandablevalue{\stylepath.modifier}}%
+  %
+  % process for href value
+  \def\hreffortext{\getexpandablevalue{\hrefpath}}%
+  %
+  % process for bold
+  \ifnum\pdfstrcmp{\isbold}{\detokenize{true}}=0%
+    \def\boldmodifier{\bfseries}%
+  \fi%
+  %
+  % process for italic
+  \ifnum\pdfstrcmp{\isitalic}{\detokenize{true}}=0%
+    \def\italicmodifier{\itshape}%
+  \fi%
+  %
+  % process for underline
+  \ifnum\pdfstrcmp{\isunderline}{\detokenize{true}}=0%
+    \def\underlinemodifier{\color{headings}\dotuline}%
+  \fi%
+  %
+  % process for href
+  \ifnum\pdfstrcmp{\hreffortext}{\detokenize{}}>0%
+    \def\hrefmodifier{\href{\hreffortext}}%
+  \fi
+  %
+  % process for type
+  \ifnum\pdfstrcmp{\hastypemodifier}{\detokenize{1}}=0%
+    \def\typemodifier{\leavevmode\normalsize\info}%
+  \fi
+  \ifnum\pdfstrcmp{\hastypemodifier}{\detokenize{2}}=0%
+    \def\typemodifier{\leavevmode\normalsize\additionalinfo}%
+  \fi
+  %
+  % get the text value
   \def\textval{\getexpandablevalue{\textpath}}%
-  \textval%
+  %
+  % display the text
+  \typemodifier{\hrefmodifier{\boldmodifier\italicmodifier\underlinemodifier\textval}}\space%
 }%

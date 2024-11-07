@@ -68,7 +68,18 @@
                 {
                   "segments": [
                     {
-                      "text": "Worked on the YouTube Captions team in primarily vanilla Javascript and Python to plan, design and develop the full stack implementation of a new framework to add and edit Automatic Speech Recognition captions."
+                      "text": "Worked on the YouTube Captions team in primarily vanilla Javascript and Python to plan,"
+                    },
+                    {
+                      "text": "design and develop",
+                      "style": {
+                        "bold": true,
+                        "italic": true,
+                        "underline": true
+                      }
+                    },
+                    {
+                      "text": "the full stack implementation of a new framework to add and edit Automatic Speech Recognition captions."
                     }
                   ]
                 },
@@ -262,7 +273,6 @@
       {
         "id": "languages",
         "heading": "LANGUAGES",
-        "column": 2,
         "columnSettings": 2,
         "subsections": [
           {
@@ -357,6 +367,74 @@
             }
           }
         ]
+      },
+      {
+        "id": "links",
+        "heading": "LINKS",
+        "column": 2,
+        "content": {
+          "type": "list",
+          "style": {
+            "showBullets": false,
+            "spacing": "compact"
+          },
+          "items": [
+            {
+              "segments": [
+                { "text": "Facebook://" },
+                {
+                  "text": "dd",
+                  "href": "http://www.facebook.com/deedydas"
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Github://" },
+                {
+                  "text": "deedy",
+                  "href": "http://www.quora.com/Debarghya-Das"
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "LinkedIn://" },
+                {
+                  "text": "debarghyadas",
+                  "href": "https://www.linkedin.com/in/debarghyadas"
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "YouTube://" },
+                {
+                  "text": "DeedyDash007",
+                  "href": "https://www.youtube.com/user/DeedyDash007"
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Twitter://" },
+                {
+                  "text": "@debargya_das",
+                  "href": "https://twitter.com/debargya_das"
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Quora://" },
+                {
+                  "text": "Debarghya-Das",
+                  "href": "http://www.quora.com/Debarghya-Das"
+                }
+              ]
+            }
+          ]
+        }
       }
     ]
   }

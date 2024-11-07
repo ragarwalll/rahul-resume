@@ -1,7 +1,23 @@
 \def\showBullets{false}
+\def\usingColumns{false}
 
 \newcommand{\processsubsection}[1]{%
-  \expandafter\callSafeParseJSON\expandafter{#1}{heading}{processsubsections}%
+  \def\sectioncolumnssettingvalue{1}%
+  \edef\currentsectioncolumnsettingskey{#1.columnSettings}%
+  \def\currentsectioncolumnsettings{\getexpandablevalue{\currentsectioncolumnsettingskey}}%
+  \ifnum\pdfstrcmp{\currentsectioncolumnsettings}{\detokenize{1}}=0%
+    \expandafter\callSafeParseJSON\expandafter{#1.subsections}{heading}{processsubsections}%
+  \else%
+    \ifnum\pdfstrcmp{\currentsectioncolumnsettings}{\detokenize{}}=0%
+      \expandafter\callSafeParseJSON\expandafter{#1.subsections}{heading}{processsubsections}%
+    \else%
+      \gdef\usingColumns{true}%
+      \begin{multicols}{\currentsectioncolumnsettings}%
+        \expandafter\callSafeParseJSON\expandafter{#1.subsections}{heading}{processsubsectionswithminipage}%
+      \end{multicols}%
+      \gdef\usingColumns{false}%
+    \fi
+  \fi
 }%
 
 \newcommand{\processsubsections}{%
@@ -11,5 +27,17 @@
   \displayinfo{\subsectionkey.info}%
   \displaymetadata{\subsectionkey.metadata}%
   \displaycontent{\subsectionkey.content}%
+  \endgroup%
+}%
+
+\newcommand{\processsubsectionswithminipage}{%
+  \begingroup%
+  \begin{minipage}{\columnwidth}
+    \edef\subsectionkey{\parseJSONKey[\JSONParseArrayIndex]}%
+    \altsubsection{\processvalueforkey{\parseJSONKey\JSONParseArrayKeyI}}%
+    \displayinfo{\subsectionkey.info}%
+    \displaymetadata{\subsectionkey.metadata}%
+    \displaycontent{\subsectionkey.content}%
+  \end{minipage}
   \endgroup%
 }%

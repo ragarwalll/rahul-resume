@@ -112,7 +112,13 @@ async function processFiles() {
 
         // Find all .tex and .cls files
         const texFiles = glob.sync('**/*.{tex,cls}', {
-            ignore: ['node_modules/**', 'build/**', 'dist/**', '_minted-*/**']
+            ignore: [
+                'node_modules/**',
+                'build/**',
+                'dist/**',
+                '_minted-*/**',
+                '**/python-data.tex'
+            ]
         });
 
         if (texFiles.length === 0) {

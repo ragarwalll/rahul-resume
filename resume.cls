@@ -58,9 +58,6 @@
 % This command loads the 'isodate' package with formatting for UK English dates
 \RequirePackage[UKenglish]{isodate}
 
-% This command loads the 'jsonparse' package which provides JSON support
-\RequirePackage{jsonparse}
-
 % This command loads the setspace` package which provides line spacing commands
 \RequirePackage{setspace}
 
@@ -109,20 +106,6 @@
   \input{cmd/additional-info.tex}
   \input{cmd/json-processor.tex}
   \input{cmd/trim-spaces.tex}
-
-  \input{processor/header.tex}
-  \input{processor/main.tex}
-  \input{processor/sections.tex}
-  \input{processor/sub-sections.tex}
-  \input{processor/display-info.tex}
-  \input{processor/display-metadata.tex}
-  \input{processor/display-content.tex}
-  \input{processor/process-inline-list.tex}
-  \input{processor/process-list.tex}
-  \input{processor/process-paragraph.tex}
-  \input{processor/process-segments.tex}
-  \input{processor/process-text.tex}
-  \input{processor/utils.tex}
 }
 
 % Command to load present

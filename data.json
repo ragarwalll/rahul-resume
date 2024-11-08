@@ -3,18 +3,6 @@
   "middleName": "",
   "lastName": "Agarwal",
   "resume": {
-    "layout": {
-      "columns": [
-        {
-          "width": 0.3,
-          "sections": ["education", "languages"]
-        },
-        {
-          "width": 0.7,
-          "sections": ["experience", "research"]
-        }
-      ]
-    },
     "sections": [
       {
         "id": "experience",

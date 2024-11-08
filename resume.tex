@@ -16,9 +16,6 @@
 % Set the right footer to the page number
 \rfoot{Page \thepage{}\hspace{1pt}}%
 %
-% load the data files
-\JSONParseFromFile[externalize=true]{\data}{data.json}%
-%
 % ===================================== Document =====================================
 %
 % Begin the document
@@ -35,6 +32,10 @@
 % |
 \lastupdated{}%
 %
-\buildresume%
+% print the resume
+% chktex-file 12
+% latexindent-ignore
+\input{processor/python-data.tex}
+
 % End the document
 \end{document}%

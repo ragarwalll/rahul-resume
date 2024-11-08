@@ -11,3 +11,4 @@ out.tex
 resume_data.jsonparse
 resume.xdv
 resume.synctex(busy)
+processor/python-data.tex

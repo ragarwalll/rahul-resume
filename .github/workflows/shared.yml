@@ -13,24 +13,92 @@ on:
         default: "."
         type: string
 
-# Add permissions for PR comments
 permissions:
   actions: read
   pull-requests: write
   contents: read
 
 jobs:
+  python-processing:
+    runs-on: ubuntu-latest
+    outputs:
+      data_generated: ${{ steps.python-run.outputs.data_generated }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "⚠️ No requirements.txt found"
+          fi
+
+      - name: Run Python script
+        id: python-run
+        run: |
+          echo "Running Python processing..."
+          if [ -f processor/python/main.py ]; then
+            python processor/python/main.py --input data.json --output processor/python-data.tex
+            if [ -f processor/python-data.tex ]; then
+              echo "data_generated=true" >> $GITHUB_OUTPUT
+              echo "✅ Successfully generated python-data.tex"
+            else
+              echo "❌ python-data.tex was not generated"
+              echo "data_generated=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          else
+            echo "❌ processor/python/main.py not found"
+            echo "data_generated=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Upload Generated TEX
+        if: steps.python-run.outputs.data_generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-data-tex
+          path: processor/python-data.tex
+
+      - name: Generate Python Summary
+        if: always()
+        run: |
+          echo "# 🐍 Python Processing Report" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.python-run.outputs.data_generated }}" == "true" ]; then
+            echo "### ✅ Python Processing Status: Successful" >> $GITHUB_STEP_SUMMARY
+            echo "- Successfully generated python-data.tex at processor/python-data.tex" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Python Processing Status: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- Failed to generate python-data.tex" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Python logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-logs
+          path: |
+            processor/python/*.log
+            ./*.log
+
   latex-check-and-build:
+    needs: [python-processing]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/xu-cheng/texlive-full:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Update jsonparse
-        run: |
-          tlmgr update jsonparse
 
       - name: Find and validate config files
         id: config
@@ -154,11 +222,16 @@ jobs:
             exit 1
           fi
 
+      - name: Download Generated TEX
+        uses: actions/download-artifact@v4
+        with:
+          name: python-data-tex
+          path: processor/
+
       - name: Build PDF with XeLaTeX
         id: build-pdf
         working-directory: ${{ inputs.working_directory }}
         run: |
-
           # Clean any existing auxiliary files
           rm -f *.aux *.log *.out *.pdf
 
@@ -178,46 +251,47 @@ jobs:
           path: ${{ inputs.working_directory }}/*.pdf
           if-no-files-found: error
 
-      - name: Generate Summary
+      - name: Generate Build Summary
         if: always()
         env:
           FORMAT_ERRORS: ${{ steps.format.outputs.format_errors }}
           LINT_ERRORS: ${{ steps.lint.outputs.lint_errors }}
           LINT_WARNINGS: ${{ steps.lint.outputs.lint_warnings }}
           PDF_EXIT_CONCLUSION: ${{ steps.build-pdf.conclusion }}
+          PYTHON_STATUS: ${{ needs.python-processing.outputs.data_generated }}
         run: |
-          # Start with a header
-          #print pdf build code
           echo "# 📑 LaTeX Build Report" >> $GITHUB_STEP_SUMMARY
 
           # Add status banner
-          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
+          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ] && [ "$PYTHON_STATUS" = "true" ]; then
             echo "### ✅ Build Status: Successful" >> $GITHUB_STEP_SUMMARY
           else
             echo "### ❌ Build Status: Failed" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Add processing statistics
           echo "## 📊 Processing Statistics" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Count | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Files Processed | ${{ steps.find-tex.outputs.file_count }} | ℹ️ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Files Processed | ${{ needs.format-and-lint.outputs.total_files }} | ℹ️ |" >> $GITHUB_STEP_SUMMARY
 
-          # Add formatting status with emoji
           if [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
             echo "| PDF Build | - | ✅ |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| PDF Build Issue | 1 | ❌ |" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Add formatting status with emoji
+          if [ "$PYTHON_STATUS" = "true" ]; then
+            echo "| Python Processing | - | ✅ |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Python Processing | Failed | ❌ |" >> $GITHUB_STEP_SUMMARY
+          fi
+
           if [ "$FORMAT_ERRORS" = "0" ]; then
             echo "| Formatting Issues | 0 | ✅ |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Formatting Issues | $FORMAT_ERRORS | ❌ |" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Add linting status with emoji
           if [ "$LINT_ERRORS" = "0" ]; then
             echo "| Linting Errors | 0 | ✅ |" >> $GITHUB_STEP_SUMMARY
           else
@@ -230,35 +304,11 @@ jobs:
             echo "| Linting Warnings | $LINT_WARNINGS | ⚠️ |" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Add artifact information if build succeeded
-          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
+          if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ] && [ "$PYTHON_STATUS" = "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "## 📋 Build Artifacts" >> $GITHUB_STEP_SUMMARY
             echo "✅ PDF has been generated successfully" >> $GITHUB_STEP_SUMMARY
             echo "- The generated PDF is available in the workflow artifacts" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # Add note about errors if any
-          if [ "$FORMAT_ERRORS" != "0" ] || [ "$LINT_ERRORS" != "0" ] || [ "$LINT_WARNINGS" != "0" ] || [ "$PDF_EXIT_CONCLUSION" != "success" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "## ⚠️ Issues Found" >> $GITHUB_STEP_SUMMARY
-            echo "Please check the workflow logs for detailed error messages and fix the following:" >> $GITHUB_STEP_SUMMARY
-            
-            if [ "$FORMAT_ERRORS" != "0" ]; then
-              echo "- ❌ Fix formatting issues in $FORMAT_ERRORS files" >> $GITHUB_STEP_SUMMARY
-            fi
-            
-            if [ "$LINT_ERRORS" != "0" ]; then
-              echo "- ❌ Fix linting errors in $LINT_ERRORS files" >> $GITHUB_STEP_SUMMARY
-            fi
-            
-            if [ "$LINT_WARNINGS" != "0" ]; then
-              echo "- ⚠️ Address linting warnings in $LINT_WARNINGS files" >> $GITHUB_STEP_SUMMARY
-            fi
-
-            if [ "$PDF_EXIT_CONCLUSION" != "success" ]; then
-              echo "- ❌ PDF generation failed due to an error" >> $GITHUB_STEP_SUMMARY
-            fi
           fi
 
       - name: Comment on PR
@@ -271,17 +321,19 @@ jobs:
             const lintErrors = parseInt('${{ steps.lint.outputs.lint_errors }}') || 0;
             const lintWarnings = parseInt('${{ steps.lint.outputs.lint_warnings }}') || 0;
             const buildPdfFailed = '${{ steps.build-pdf.conclusion }}' === 'failure' ? 1 : 0;
+            const pythonFailed = '${{ needs.python-processing.outputs.data_generated }}' !== 'true' ? 1 : 0;
 
             let status = '✅ Build Successful';
             let color = '0E8A16'; // green
             let details = '';
 
-            if (formatErrors > 0 || lintErrors > 0 || lintWarnings > 0 || buildPdfFailed > 0) {
+            if (formatErrors > 0 || lintErrors > 0 || lintWarnings > 0 || buildPdfFailed > 0 || pythonFailed > 0) {
               status = '❌ Build Failed';
               color = 'D93F0B'; // red
               details = `
               ### Build Statistics
-              - Total files processed: ${{ steps.find-tex.outputs.file_count }}
+              - Total files processed: ${{ needs.format-and-lint.outputs.total_files }}
+              - Python processing status: ${pythonFailed ? 'Failed' : 'Successful'}
               - PDF generation status: ${buildPdfFailed ? 'Failed' : 'Successful'}
               - Files with formatting issues: ${formatErrors}
               - Files with lint errors: ${lintErrors}
@@ -293,11 +345,12 @@ jobs:
               const artifactUrl = '${{ steps.upload_pdf.outputs.artifact-url }}';
               details = `
               ### 📄 PDF has been generated successfully!
-              
+
               🔗 [Download PDF](${artifactUrl})
               
               ### Build Statistics
-              - Total files processed: ${{ steps.find-tex.outputs.file_count }}
+              - Total files processed: ${{ needs.format-and-lint.outputs.total_files }}
+              - Python processing completed ✅
               - All formatting checks passed ✅
               - All lint checks passed ✅
               `;
@@ -321,7 +374,6 @@ jobs:
             });
 
             if (botComment) {
-              // Update existing comment
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -329,7 +381,6 @@ jobs:
                 body: comment
               });
             } else {
-              // Create new comment if none exists
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,

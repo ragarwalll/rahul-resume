@@ -1,0 +1,260 @@
+name: issue-comments
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  process-trigger:
+    if: contains(github.event.comment.body, '/trigger')
+    runs-on: ubuntu-latest
+    outputs:
+      file_found: ${{ steps.extract.outputs.status }}
+      file_upload: ${{ steps.download.outputs.status }}
+    steps:
+      - name: Find existing response
+        id: find-comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            // Look for our bot's existing response to this specific trigger comment
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes(`<!-- Response to comment: ${context.payload.comment.id} -->`)
+            );
+
+            return botComment ? botComment.id : null;
+
+      - name: Initial response
+        id: initial-comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+            > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+            @${context.payload.comment.user.login} ⟳ build started
+            &nbsp;&nbsp;→ \`eta\`: 4 minutes
+            &nbsp;&nbsp;→ please wait...
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+            if (!${{ steps.find-comment.outputs.result }}) {
+              // Create new comment if none exists
+              const comment = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+              return comment.data.id;
+            } else {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: ${{ steps.find-comment.outputs.result }},
+                body: commentBody
+              });
+              return ${{ steps.find-comment.outputs.result }};
+            }
+
+      - name: Extract and validate JSON URL
+        id: extract
+        continue-on-error: true
+        run: |
+          # Extract the URL of the uploaded JSON file
+          JSON_URL=$(echo '${{ github.event.comment.body }}' | grep -o 'https://.*\.json' || true)
+
+          if [ -z "$JSON_URL" ]; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "error_message=No JSON file URL found in comment" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "json_url=${JSON_URL}" >> $GITHUB_OUTPUT
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "Found JSON URL: ${JSON_URL}"
+
+      - name: Update comment on URL extraction failure
+        if: steps.extract.outputs.status == 'failed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+            > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+            @${context.payload.comment.user.login} ✗ json validation failed
+            &nbsp;&nbsp;→ \`cause\`: ${{ steps.extract.outputs.error_message }}
+            &nbsp;&nbsp;→ \`solution\`: please make sure your comment includes a valid .json file
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            \`hint: use format https://<domain>/file.json\``;
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.initial-comment.outputs.result }},
+              body: commentBody
+            });
+
+      - name: Download and validate JSON
+        if: steps.extract.outputs.status == 'success'
+        id: download
+        continue-on-error: true
+        run: |
+          HTTP_RESPONSE=$(curl -L -w "%{http_code}" -o data.json "${{ steps.extract.outputs.json_url }}" || echo "000")
+
+          if [ "$HTTP_RESPONSE" != "200" ]; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "error_message=Failed to download JSON file. HTTP response: $HTTP_RESPONSE" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          if ! jq empty data.json 2>/dev/null; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "error_message=Invalid JSON format" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Update comment on download failure
+        if: steps.download.outputs.status == 'failed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+            > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+            @${context.payload.comment.user.login} ✗ json validation failed
+            &nbsp;&nbsp;→ \`cause\`: ${{ steps.download.outputs.error_message }}
+            &nbsp;&nbsp;→ \`solution\`: please make sure your comment includes a valid .json file
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.initial-comment.outputs.result }},
+              body: commentBody
+            });
+
+      - name: Upload JSON as artifact
+        if: steps.download.outputs.status == 'success'
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-json
+          path: data.json
+          retention-days: 5
+
+      - name: Update comment on upload failure
+        if: ${{ steps.download.outputs.status == 'success' && steps.upload.outputs.uploaded == 'false' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+            > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+            @${context.payload.comment.user.login} ✗ uploading artifact failed
+            &nbsp;&nbsp;→ \`fix\`: update comment with new json
+            &nbsp;&nbsp;→ \`help\`: reach repo owner (@ragarwalll)
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.initial-comment.outputs.result }},
+              body: commentBody
+            });
+
+  build:
+    needs: process-trigger
+    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }}
+    uses: ./.github/workflows/shared.yml
+    with:
+      artifact-name: "data-json"
+      main_document: resume.tex
+      working_directory: "."
+  summarize:
+    needs: build
+    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find and update comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check if process-trigger job failed
+            const buildSuccess = '${{ needs.build.result }}' === 'success';
+
+            // Get LaTeX build outputs if build was successful
+            const artifactUrl = '${{ needs.build.outputs.artifact_url }}' || '';
+
+            let commentBody;
+            let reaction;
+
+            if (!buildSuccess) {
+              // Build process failure case
+              commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+              > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+              @${context.payload.comment.user.login} ✗ latex build failed
+              &nbsp;&nbsp;→ \`cause\`: possible json format is not according to schema
+              &nbsp;&nbsp;→ \`options\`:
+              &nbsp;&nbsp;&nbsp;&nbsp;• read readme guide
+              &nbsp;&nbsp;&nbsp;&nbsp;• use ai validation tool
+              &nbsp;&nbsp;&nbsp;&nbsp;• reach @ragarwalll for help
+              &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+            } else {
+              // Success case - determine status based on errors
+              let status = 'success';
+
+              commentBody = `<!-- Response to comment: ${context.payload.comment.id} -->
+            > ${context.payload.comment.body.split('\n').join('\n> ')}
+
+            @${context.payload.comment.user.login} ✓ build successful
+            &nbsp;&nbsp;→ \`download pdf\`: [resume.pdf](${artifactUrl})
+            &nbsp;&nbsp;→ \`enjoy?\` consider starring ⭐
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+            }
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes(`<!-- Response to comment: ${context.payload.comment.id} -->`)
+            );
+
+            // Update or create comment
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            }

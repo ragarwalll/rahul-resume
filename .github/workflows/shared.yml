@@ -12,6 +12,29 @@ on:
         required: false
         default: "."
         type: string
+      artifact-name:
+        description: "Name of the artifact to download"
+        required: false
+        type: string
+    outputs:
+      data_generated:
+        description: "Flag indicating if python data was generated"
+        value: ${{ jobs.python-processing.outputs.data_generated }}
+      format_errors:
+        description: "Number of files with formatting errors"
+        value: ${{ jobs.latex-check-and-build.outputs.format_errors }}
+      lint_errors:
+        description: "Number of files with linting errors"
+        value: ${{ jobs.latex-check-and-build.outputs.lint_errors }}
+      lint_warnings:
+        description: "Number of files with linting warnings"
+        value: ${{ jobs.latex-check-and-build.outputs.lint_warnings }}
+      total_files:
+        description: "Total number of files processed"
+        value: ${{ jobs.latex-check-and-build.outputs.total_files }}
+      artifact_url:
+        description: "URL to download the generated PDF"
+        value: ${{ jobs.latex-check-and-build.outputs.artifact_url }}
 
 permissions:
   actions: read
@@ -41,6 +64,13 @@ jobs:
           else
             echo "⚠️ No requirements.txt found"
           fi
+
+      - name: Download Generated TEX
+        if: ${{ inputs.artifact-name != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working_directory }}
 
       - name: Run Python script
         id: python-run
@@ -94,6 +124,12 @@ jobs:
   latex-check-and-build:
     needs: [python-processing]
     runs-on: ubuntu-latest
+    outputs:
+      format_errors: ${{ steps.format.outputs.format_errors }}
+      lint_errors: ${{ steps.lint.outputs.lint_errors }}
+      lint_warnings: ${{ steps.lint.outputs.lint_warnings }}
+      total_files: ${{ steps.find-tex.outputs.file_count }}
+      artifact_url: ${{ steps.upload_pdf.outputs.artifact-url }}
     container:
       image: ghcr.io/xu-cheng/texlive-full:latest
     steps:

@@ -87,6 +87,37 @@ class SubsectionConfig:
         return section.get("columnSettings", self.default_columns)
 
 
+class SpacingModel(Enum):
+    """Display sizing mode for LaTeX content"""
+
+    TIGHT = 0.7  # Tight spacing
+    ULTRA = 0.78  # Ultimate density
+    MAXIMUM = 0.81  # Maximum practical density
+    PRO_DENSE = 0.87  # Professional density
+    HIGH_DENSE = 0.84  # High content density
+    SEMI_DENSE = 0.9  # Moderately dense
+    LIGHT_DENSE = 0.95  # Slightly increased density
+    COMPACT = 0.85  # Dense, maximizes space
+    NORMAL = 1.0  # Standard spacing
+    COZY = 1.15  # Comfortable reading
+    AIRY = 1.3  # Lots of whitespace
+    MINIMAL = 0.75  # Ultra-compact
+    SPACIOUS = 1.4  # Maximum readability
+
+
+@dataclass
+class LatexSizeModifier:
+    """Data class for LaTeX size modifier configuration"""
+
+    begin: str = "{\\setstretch{spacing_here}\n\\begingroup"
+    end: str = "\\endgroup}"
+
+    def wrap(self, content: str, spacing: int) -> List[str]:
+        """Wrap content with size modifier tags"""
+
+        return [self.begin.replace("spacing_here", str(spacing)), content, self.end]
+
+
 @dataclass
 class SubsectionElements:
     """Configuration for subsection elements"""
@@ -313,7 +344,7 @@ class ResumeContentGenerator:
             "$": r"\$",
             "#": r"\#",
             "_": r"\_",
-            "-": r"\-",
+            # "-": r"\-",
             "{": r"\{",
             "}": r"\}",
             " ": r"{\space}",
@@ -512,8 +543,16 @@ class ResumeContentGenerator:
             col_config.end,
         ]
 
+        spacing = SpacingModel[
+            self.data.get("spacing", SpacingModel.NORMAL.name).upper()
+        ].value
         # Filter out empty strings and join with newlines
-        return "\n".join(filter(None, layout))
+        return self.format_output_array(
+            LatexSizeModifier().wrap(
+                "\n".join(filter(None, layout)),
+                spacing,
+            )
+        )
 
     def process_single_section(
         self,
@@ -830,6 +869,7 @@ class ResumeContentGenerator:
             \\begin{itemize}\\item Item 1\\item Item 2\\end{itemize}
         """
         formatters = self.formatters
+
         # Handle direct list input
         if isinstance(content, list):
             content = {"type": default_type, "items": content}
@@ -904,6 +944,7 @@ class ResumeContentGenerator:
             # Add inline list if present
             if inline_list := item.get("inlineList"):
                 components.append(self.display_inline_list(inline_list))
+                # components.append("\n")
 
             return "\n".join(filter(None, components))
 
@@ -913,7 +954,12 @@ class ResumeContentGenerator:
                 return ""
 
             # Process all items
-            processed_items = [process_list_item(item) for item in items]
+            processed_items = [*[process_list_item(item) for item in items]]
+
+            # check if processed items[0] ends with "\newline"
+            # if yes append newline to the end to processed_items[0]
+            if processed_items[-1].endswith("\\newline"):
+                processed_items[-1] += "\n"
 
             # Wrap in group
             components = [config.group_begin, *processed_items, config.group_end]

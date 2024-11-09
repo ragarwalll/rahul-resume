@@ -3,6 +3,7 @@
   "middleName": "",
   "lastName": "Agarwal",
   "preset": "deedy-inspired-open-fonts",
+  "spacing": "PRO_DENSE",
   "showLastUpdated": true,
   "links": [
     {
@@ -288,6 +289,7 @@
       {
         "id": "languages",
         "heading": "LANGUAGES",
+        "column": 1,
         "columnSettings": 2,
         "fullWidth": true,
         "subsections": [

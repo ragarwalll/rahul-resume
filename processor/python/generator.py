@@ -93,8 +93,8 @@ class SpacingModel(Enum):
     TIGHT = 0.7  # Tight spacing
     ULTRA = 0.78  # Ultimate density
     MAXIMUM = 0.81  # Maximum practical density
-    PRO_DENSE = 0.87  # Professional density
     HIGH_DENSE = 0.84  # High content density
+    PRO_DENSE = 0.87  # Professional density
     SEMI_DENSE = 0.9  # Moderately dense
     LIGHT_DENSE = 0.95  # Slightly increased density
     COMPACT = 0.85  # Dense, maximizes space
@@ -1018,8 +1018,8 @@ class ResumeContentGenerator:
 
             # check if processed items[0] ends with "\newline"
             # if yes append newline to the end to processed_items[0]
-            if processed_items[-1].endswith("\\newline"):
-                processed_items[-1] += "\n"
+            if processed_items[-1].endswith("inline_list"):
+                processed_items[-1] += "\n\\vspace{\\baselineskip}\\\\"
 
             # Wrap in group
             components = [config.group_begin, *processed_items, config.group_end]
@@ -1083,7 +1083,7 @@ class ResumeContentGenerator:
 
             # Add newline if content exists
             if formatted_list:
-                return f"{formatted_list}\n{config.new_line}"
+                return f"{formatted_list}%inline_list"
 
             return ""
 

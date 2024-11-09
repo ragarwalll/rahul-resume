@@ -2,11 +2,33 @@
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
+  "links": [
+    {
+      "text": "debarghyadas",
+      "href": "https://www.linkedin.com/in/debarghyadas"
+    },
+    {
+      "text": "debarghyadas",
+      "href": "https://www.linkedin.com/in/debarghyadas",
+      "column": 1
+    },
+    {
+      "text": "debarghyadas",
+      "href": "https://www.linkedin.com/in/debarghyadas",
+      "column": 2
+    },
+    {
+      "text": "debarghyadas",
+      "href": "https://www.linkedin.com/in/debarghyadas",
+      "column": 2
+    }
+  ],
   "resume": {
     "sections": [
       {
         "id": "experience",
         "heading": "EXPERIENCE",
+        "column": 1,
         "columnSettings": 1,
         "subsections": [
           {
@@ -135,6 +157,7 @@
         "id": "research",
         "heading": "RESEARCH",
         "column": 1,
+        "fullWidth": false,
         "columnSettings": 1,
         "subsections": [
           {
@@ -262,6 +285,7 @@
         "id": "languages",
         "heading": "LANGUAGES",
         "columnSettings": 2,
+        "fullWidth": true,
         "subsections": [
           {
             "heading": "PROGRAMMING",

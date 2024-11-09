@@ -394,6 +394,7 @@ class ResumeContentGenerator:
         first_name = self.get_value("firstName")
         middle_name = self.get_value("middleName")
         last_name = self.get_value("lastName")
+        links = ""
 
         # depending on where any or all of the names are missing, the full name is constructed
         # if lets say the first name is missing,
@@ -402,8 +403,11 @@ class ResumeContentGenerator:
         if middle_name:
             first_name = f"{first_name} {middle_name}"
 
+        if self.data.get("links"):
+            links = self.process_links(self.data.get("links", []))
+
         output.append(
-            f"\\namesection{{{first_name}}}{{{last_name}}}{{\\urlstyle{{same}}{self.process_links(self.data.get("links", []))}}}"
+            f"\\namesection{{{first_name}}}{{{last_name}}}{{\\urlstyle{{same}}{links}}}"
         )
 
         return self.format_output_array(output)
@@ -1099,6 +1103,17 @@ class ResumeContentGenerator:
     def build_resume(self) -> str:
         """Build resume content."""
         output = ["% chktex-file 6", "% chktex-file 36"]
+
+        output.append("% ============ Display Presets ============")
+        preset = self.get_value("preset")
+        if preset:
+            output.append(f"\\loadpresent{{{preset}}}")
+        else:
+            output.append("\\loadpresent{deedy-inspired-open-fonts}")
+
+        output.append("% ======== Display Last Updated ==========")
+        if self.data.get("showLastUpdated", True):
+            output.append("\\lastupdated%")
 
         # process name section
         output.append("% ============ Display Header ============")

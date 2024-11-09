@@ -2,6 +2,8 @@
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
+  "preset": "deedy-inspired-open-fonts",
+  "showLastUpdated": true,
   "links": [
     {
       "text": "debarghyadas",

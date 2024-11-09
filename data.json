@@ -397,7 +397,10 @@
                 { "text": "Facebook://" },
                 {
                   "text": "dd",
-                  "href": "http://www.facebook.com/deedydas"
+                  "href": "http://www.facebook.com/deedydas",
+                  "style": {
+                    "bold": true
+                  }
                 }
               ]
             },

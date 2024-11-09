@@ -183,6 +183,7 @@ class ContentType(Enum):
     LIST = "list"
     PARAGRAPH = "paragraph"
     INLINE_LIST = "inline_list"
+    TABLE = "table"
 
 
 @dataclass
@@ -191,6 +192,7 @@ class ContentFormatters:
 
     list_formatter: Callable[[Dict[str, Any]], str]
     paragraph_formatter: Callable[[Dict[str, Any]], str]
+    table_formatter: Callable[[Dict[str, Any]], str]
     inline_list_formatter: Optional[Callable[[Dict[str, Any]], str]] = None
 
     def get_formatter(self, content_type: str) -> Callable:
@@ -198,8 +200,8 @@ class ContentFormatters:
         formatters = {
             ContentType.LIST.value: self.list_formatter,
             ContentType.PARAGRAPH.value: self.paragraph_formatter,
-            ContentType.INLINE_LIST.value: self.inline_list_formatter
-            or self.list_formatter,
+            ContentType.INLINE_LIST.value: self.inline_list_formatter,
+            ContentType.TABLE.value: self.table_formatter or self.list_formatter,
         }
         return formatters.get(content_type, self.list_formatter)
 
@@ -286,6 +288,34 @@ class StyleConfig:
 
 
 @dataclass
+class TableConfig:
+    """Configuration for table formatting"""
+
+    environment: str = "tabular"
+    column_format: str = "l"
+    row_separator: str = "\n"
+    column_separator: str = " & "
+    row_end: str = " \\\\"
+    begin: str = "\\begin{tabular}{rll}"
+    end: str = "\\end{tabular}"
+
+    def wrap_in_environment(self, content: str) -> str:
+        """Wrap content in LaTeX environment"""
+        return f"{self.begin}%\n{content}%\n{self.end}"
+
+    def format_row(self, cells: List[str], escape_latex: callable) -> str:
+        """Format row with cells"""
+        cells = [escape_latex(cell) for cell in cells]
+        return f"{self.column_separator.join(cells)}{self.row_end}"
+
+    def format_table(self, rows: List[List[str]], escape_latex: callable) -> str:
+        """Format table with rows"""
+        return self.row_separator.join(
+            self.format_row(row, escape_latex) for row in rows
+        )
+
+
+@dataclass
 class ParagraphConfig:
     """Configuration for paragraph formatting"""
 
@@ -316,6 +346,7 @@ class ResumeContentGenerator:
             list_formatter=self.display_list,
             paragraph_formatter=self.display_paragraph,
             inline_list_formatter=self.display_inline_list,
+            table_formatter=self.display_table,
         )
 
     def escape_latex(
@@ -885,6 +916,35 @@ class ResumeContentGenerator:
             return formatter(content)
 
         return format_content()
+
+    def display_table(
+        self, content: Dict[str, Any], config: Optional[TableConfig] = None
+    ):
+        """
+        Display table content with rows and columns.
+
+        Args:
+            content: Table content with rows and columns
+            config: Optional table formatting configuration
+
+        Returns:
+            str: Formatted LaTeX table
+        """
+
+        # Use default config if none provided
+        config = config or TableConfig()
+
+        def format_table() -> str:
+            """Format table with rows and columns"""
+            if not (rows := content.get("rows", [])):
+                return ""
+
+            # Build table
+            return config.wrap_in_environment(
+                config.format_table(rows, self.escape_latex)
+            )
+
+        return format_table()
 
     def display_list(
         self,

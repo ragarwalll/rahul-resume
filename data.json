@@ -192,6 +192,19 @@
         ]
       },
       {
+        "id": "awards",
+        "heading": "Awards",
+        "column": 2,
+        "columnSettings": 1,
+        "content": {
+          "type": "table",
+          "rows": [
+            ["Data1", "Data2"],
+            ["Data3", "Data4"]
+          ]
+        }
+      },
+      {
         "id": "education",
         "heading": "EDUCATION",
         "column": 2,

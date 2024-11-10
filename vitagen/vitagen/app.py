@@ -1,12 +1,17 @@
-"""
-Main script to generate resume content from JSON file.
-"""
+"""The server module."""
 
 import argparse
 import json
 from pathlib import Path
 from typing import Union
-from generator import ResumeContentGenerator
+from .logger.struct_json_logger import configure_logging, get_logger
+from .constants import (
+    ERROR_PROVIDE_A_VALID_JSON_FILE_PATH,
+    INFO_RESUME_TEX_GENERATED_SUCCESSFULLY,
+)
+from .generator.main import ResumeContentGenerator
+
+__all__ = ["start"]
 
 parser = argparse.ArgumentParser()
 
@@ -56,7 +61,21 @@ def get_absolute_path(
     return (base / path).resolve()
 
 
-if __name__ == "__main__":
+def prepare():
+    """
+    Prepare the application for running
+    """
+    configure_logging()
+
+
+def start():
+    """
+    Start the application
+    """
+    prepare()
+
+    default_logger = get_logger("vitagen")
+
     args = parser.parse_args()
     if args.input and args.output:
         # resolve path to the JSON file
@@ -68,11 +87,11 @@ if __name__ == "__main__":
             data = json.loads(f.read())
 
         generator = ResumeContentGenerator(data)
-        RESUME_CONTENT = generator.build_resume()
+        resume_content = generator.build_resume()
 
         with open(args.output, "w", encoding="utf-8") as f:
-            f.write(RESUME_CONTENT)
+            f.write(resume_content)
 
-        print("Resume TEX generated successfully.")
+        default_logger.info(INFO_RESUME_TEX_GENERATED_SUCCESSFULLY, value=args.output)
     else:
-        print("Please provide the path to the JSON file.")
+        default_logger.info(ERROR_PROVIDE_A_VALID_JSON_FILE_PATH, value=args.input)

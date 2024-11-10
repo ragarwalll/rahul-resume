@@ -1,341 +1,29 @@
-"""
-Generate LaTeX resume content from JSON data.
-"""
+"""Main module for resume content generation."""
 
-from typing import List, Optional, Dict, Any, Final, Iterator, Callable, Union, Set
-from itertools import groupby
-from dataclasses import dataclass, field
-from operator import itemgetter
 import re
-from enum import Enum
 from functools import lru_cache, reduce
-
-
-class ColumnType(Enum):
-    """Column layout and position types"""
-
-    SINGLE = 1
-    LEFT = 1
-    RIGHT = 2
-    MULTI = 2
-
-
-@dataclass
-class LatexColumn:
-    """Data class for LaTeX column configuration"""
-
-    ratio: float = 0.618  # Golden ratio
-    begin: str = "\\begin{paracol}{2}"
-    end: str = "\\end{paracol}"
-    left_begin: str = "\\begin{leftcolumn}"
-    left_end: str = "\\end{leftcolumn}"
-    right_begin: str = "\\begin{rightcolumn}"
-    right_end: str = "\\end{rightcolumn}"
-
-
-@dataclass
-class LatexEnvironment:
-    """LaTeX environment configuration"""
-
-    begin: str
-    end: str
-
-    def wrap(self, content: str) -> List[str]:
-        """Wrap content with environment tags"""
-        return [self.begin, content, self.end]
-
-
-@dataclass
-class MinipageConfig:
-    """Configuration for minipage environment"""
-
-    regular_width: str = "\\dimexpr\\linewidth-2\\fboxsep\\relax"
-    full_width: str = "\\textwidth"
-    end: str = "\\end{minipage} "
-
-    def get_environment(self, is_full: bool) -> LatexEnvironment:
-        """Get appropriate minipage environment"""
-        width = self.full_width if is_full else self.regular_width
-        return LatexEnvironment(
-            begin=f"\\noindent\\begin{{minipage}}{{{width}}}", end=self.end
-        )
-
-
-@dataclass
-class SectionConfig:
-    """Configuration for section formatting"""
-
-    minipage: MinipageConfig = field(default_factory=MinipageConfig)
-    group: LatexEnvironment = field(
-        default_factory=lambda: LatexEnvironment(begin="\\begingroup", end="\\endgroup")
-    )
-    separator: str = "\\sectionseperator%"
-    title_format: str = "\\raggedright\\section{{{}}}"
-
-
-@dataclass
-class SubsectionConfig:
-    """Configuration for subsection formatting"""
-
-    multicol_sep: str = (
-        "\\setlength{\\multicolsep}{\\dimexpr\\fpeval{-10 + (2 * \\spacingscale)}pt\\relax}%"
-    )
-    multicol_begin: str = "\\begin{multicols}"
-    multicol_end: str = "\\end{multicols}"
-    default_columns: int = 1
-
-    def get_column_settings(self, section: Dict[str, Any]) -> int:
-        """Get column settings with default"""
-        return section.get("columnSettings", self.default_columns)
-
-
-class SpacingModel(Enum):
-    """Display sizing mode for LaTeX content"""
-
-    TIGHT = 0.7  # Tight spacing
-    ULTRA = 0.78  # Ultimate density
-    MAXIMUM = 0.81  # Maximum practical density
-    HIGH_DENSE = 0.84  # High content density
-    PRO_DENSE = 0.87  # Professional density
-    SEMI_DENSE = 0.9  # Moderately dense
-    LIGHT_DENSE = 0.95  # Slightly increased density
-    COMPACT = 0.85  # Dense, maximizes space
-    NORMAL = 1.0  # Standard spacing
-    COZY = 1.15  # Comfortable reading
-    AIRY = 1.3  # Lots of whitespace
-    MINIMAL = 0.75  # Ultra-compact
-    SPACIOUS = 1.4  # Maximum readability
-
-
-@dataclass
-class LatexScalingFactor:
-    """Data class for LaTeX scaling modifier configuration"""
-
-    begin: str = "\\begin{scalingfactor}{spacing_here}\n\\begingroup"
-    end: str = "\\endgroup\n\\end{scalingfactor}"
-
-    def wrap(self, content: str, spacing: int) -> List[str]:
-        """Wrap content with size modifier tags"""
-
-        return [self.begin.replace("spacing_here", str(spacing)), content, self.end]
-
-
-@dataclass
-class SubsectionElements:
-    """Configuration for subsection elements"""
-
-    group: tuple[str, str] = ("\\begingroup", "\\endgroup")
-    minipage: tuple[str, str] = (
-        "\\begin{minipage}[t]{\\columnwidth}",
-        "\\end{minipage}",
-    )
-    heading_format: str = "\\altsubsection{{{}}}"
-
-
-@dataclass
-class MetadataConfig:
-    """Configuration for metadata display"""
-
-    location: str = ""
-    duration: str = ""
-    same_line: bool = False
-
-
-class DisplayMode(Enum):
-    """Display mode for info text"""
-
-    SAME_LINE = "same_line"
-    NEW_LINE = "new_line"
-
-
-@dataclass
-class InfoFormatConfig:
-    """Configuration for info text formatting"""
-
-    pipe_separator: str = "|"
-    space_separator: str = " "
-    new_line: str = "\\newline%\n"
-    command: str = "\\info"
-
-    def get_prefix(self, mode: DisplayMode) -> str:
-        """Get appropriate prefix based on display mode"""
-        return (
-            f"{self.pipe_separator}{self.space_separator}"
-            if mode == DisplayMode.SAME_LINE
-            else self.new_line
-        )
-
-
-@dataclass
-class AdditionalInfoConfig:
-    """Configuration for additional info formatting"""
-
-    command: str = "\\additionalinfo"
-    separator: str = " | "
-    empty_separator: str = ""
-
-    def get_separator(self, has_both_texts: bool) -> str:
-        """Get appropriate separator based on text presence"""
-        return self.separator if has_both_texts else self.empty_separator
-
-
-class ContentType(Enum):
-    """Content type enumeration"""
-
-    LIST = "list"
-    PARAGRAPH = "paragraph"
-    INLINE_LIST = "inline_list"
-    TABLE = "table"
-
-
-@dataclass
-class ContentFormatters:
-    """Formatters for different content types"""
-
-    list_formatter: Callable[[Dict[str, Any]], str]
-    paragraph_formatter: Callable[[Dict[str, Any]], str]
-    table_formatter: Callable[[Dict[str, Any]], str]
-    inline_list_formatter: Optional[Callable[[Dict[str, Any]], str]] = None
-
-    def get_formatter(self, content_type: str) -> Callable:
-        """Get appropriate formatter for content type"""
-        formatters = {
-            ContentType.LIST.value: self.list_formatter,
-            ContentType.PARAGRAPH.value: self.paragraph_formatter,
-            ContentType.INLINE_LIST.value: self.inline_list_formatter,
-            ContentType.TABLE.value: self.table_formatter or self.list_formatter,
-        }
-        return formatters.get(content_type, self.list_formatter)
-
-
-class ListStyle(Enum):
-    """List style enumeration"""
-
-    BULLET = "tightemize"
-    NO_BULLET = "tightnopoints"
-
-
-@dataclass
-class ListFormatConfig:
-    """Configuration for list formatting"""
-
-    bullet_env: str = ListStyle.BULLET.value
-    no_bullet_env: str = ListStyle.NO_BULLET.value
-    space_separator: str = " "
-    group_begin: str = "{\\begingroup"
-    group_end: str = "\\endgroup}"
-
-    def get_environment(self, show_bullets: bool) -> str:
-        """Get appropriate list environment"""
-        return self.bullet_env if show_bullets else self.no_bullet_env
-
-
-@dataclass
-class ItemSegment:
-    """Structure for list item segments"""
-
-    text: str
-    inline_list: Optional[List[str]] = None
-    segments: Optional[List[Dict[str, Any]]] = None
-
-
-@dataclass
-class InlineListConfig:
-    """Configuration for inline list formatting"""
-
-    default_separator: str = "\\textbullet{}"
-    space_wrapper: str = " "
-    new_line: str = "\\newline"
-    item_wrapper: str = "{}"
-
-    def wrap_with_space(self, text: str) -> str:
-        """Wrap text with configured space wrapper"""
-        return f"{self.space_wrapper}{text}{self.space_wrapper}"
-
-    def wrap_item(self, item: str) -> str:
-        """Wrap item with configured wrapper"""
-        return self.item_wrapper.format(item)
-
-
-class TextStyle(Enum):
-    """Text style enumeration"""
-
-    BOLD = "bold"
-    ITALIC = "italic"
-    UNDERLINE = "underline"
-
-
-@dataclass
-class StyleConfig:
-    """Configuration for text styling"""
-
-    commands: Dict[TextStyle, str] = field(
-        default_factory=lambda: {
-            TextStyle.BOLD: "\\bfseries",
-            TextStyle.ITALIC: "\\itshape",
-            TextStyle.UNDERLINE: "\\dotuline",
-        }
-    )
-    href_format: str = "\\href{{{}}}{{{}}}"
-    wrapper: str = "{{{}}}"
-
-    def apply_style(self, text: str, style: TextStyle) -> str:
-        """Apply single style to text"""
-        command = self.commands.get(style)
-        return f"{command}{self.wrapper.format(text)}" if command else text
-
-    def wrap_text(self, text: str) -> str:
-        """Wrap text in standard wrapper"""
-        return self.wrapper.format(text)
-
-
-@dataclass
-class TableConfig:
-    """Configuration for table formatting"""
-
-    environment: str = "tabular"
-    column_format: str = "l"
-    row_separator: str = "\n"
-    column_separator: str = " & "
-    row_end: str = " \\\\"
-    begin: str = "\\begin{tabular}{rll}"
-    end: str = "\\end{tabular}"
-
-    def wrap_in_environment(self, content: str) -> str:
-        """Wrap content in LaTeX environment"""
-        return f"{self.begin}%\n{content}%\n{self.end}"
-
-    def format_row(self, cells: List[str], escape_latex: callable) -> str:
-        """Format row with cells"""
-        cells = [escape_latex(cell) for cell in cells]
-        return f"{self.column_separator.join(cells)}{self.row_end}"
-
-    def format_table(self, rows: List[List[str]], escape_latex: callable) -> str:
-        """Format table with rows"""
-        return self.row_separator.join(
-            self.format_row(row, escape_latex) for row in rows
-        )
-
-
-@dataclass
-class ParagraphConfig:
-    """Configuration for paragraph formatting"""
-
-    environment: str = "tightnopoints"
-    item_command: str = "\\item"
-    href_format: str = "\\href{{{}}}{{{}}}"
-
-    def wrap_in_environment(self, content: str) -> str:
-        """Wrap content in LaTeX environment"""
-        return (
-            f"\\begin{{{self.environment}}}"
-            f"{self.item_command}{{{content}}}"
-            f"\\end{{{self.environment}}}"
-        )
-
-    def create_hyperlink(self, text: str, href: str) -> str:
-        """Create hyperlink with text"""
-        return self.href_format.format(href, text)
+from itertools import groupby
+from operator import itemgetter
+from typing import Any, Dict, List, Optional, Union, Final, Set, Iterator
+from vitagen.generator.config.base import (
+    StyleConfig,
+    ColumnType,
+    DisplayMode,
+    TextStyle,
+)
+from vitagen.generator.config.content_base import ContentType, ContentFormatters
+from vitagen.generator.config.inline_list_content import InlineListConfig
+from vitagen.generator.config.paragraph_content import ParagraphConfig
+from vitagen.generator.config.table_content import TableConfig
+from vitagen.generator.config.list_content import ListFormatConfig
+from vitagen.generator.config.section import SectionConfig
+from vitagen.generator.config.sub_section import SubsectionConfig, SubsectionElements
+from vitagen.generator.config.additional_info import AdditionalInfoConfig
+from vitagen.generator.config.info import InfoFormatConfig
+from vitagen.generator.config.spacing_factor import SpacingModel, LatexScalingFactor
+from vitagen.generator.config.column import LatexColumn
+
+__all__ = ["ResumeContentGenerator"]
 
 
 class ResumeContentGenerator:
@@ -481,10 +169,12 @@ class ResumeContentGenerator:
         """Process links and generate LaTeX output.
 
         Args:
-            links (list[dict[str, str]]): List of links containing 'href', 'text' and optional 'column'
+            links (list[dict[str, str]]): List of links
+            containing 'href', 'text' and optional 'column'
 
         Returns:
-            str: Formatted LaTeX output with links organized by columns and separated by '|' and '\\'
+            str: Formatted LaTeX output with links
+            organized by columns and separated by '|' and '\\'
         """
         if not links:
             return ""
@@ -742,11 +432,13 @@ class ResumeContentGenerator:
                 components.append(elements.heading_format.format(heading))
 
             # Process info block
-            if info := subsection.get("info", {}):
-                if title := info.get("title"):
-                    components.append(
-                        self.display_info(title, same_line=info.get("sameLine", False))
+            if title := subsection.get("info", {}).get("title"):
+                components.append(
+                    self.display_info(
+                        title,
+                        same_line=subsection.get("info", {}).get("sameLine", False),
                     )
+                )
 
             # Process metadata
             if metadata := subsection.get("metadata", {}):
@@ -899,7 +591,8 @@ class ResumeContentGenerator:
 
         Examples:
             >>> formatters = ContentFormatters(
-            ...     list_formatter=lambda x: '\\begin{itemize}\\item ' + '\\item '.join(x['items']) + '\\end{itemize}',
+            ...     list_formatter=lambda x:
+            '\\begin{itemize}\\item ' + '\\item '.join(x['items']) + '\\end{itemize}',
             ...     paragraph_formatter=lambda x: '\\par ' + x['text']
             ... )
             >>> content = {"type": "list", "items": ["Item 1", "Item 2"]}
@@ -1176,7 +869,8 @@ class ResumeContentGenerator:
             ...     "href": "https://example.com"
             ... }
             >>> print(display_paragraph(content))
-            \\begin{tightnopoints}\\item{\\href{https://example.com}{Visit our website}}\\end{tightnopoints}
+            \\begin{tightnopoints}
+            \\item{\\href{https://example.com}{Visit our website}}\\end{tightnopoints}
 
             >>> content = {"text": "Simple paragraph"}
             >>> print(display_paragraph(content))
@@ -1241,10 +935,3 @@ class ResumeContentGenerator:
         )
 
         return self.format_output_array(output)
-
-
-def str_to_bool(value):
-    """Convert string to boolean."""
-    if isinstance(value, bool):
-        return value
-    return str(value).lower() in ("true", "t", "yes", "y", "1")

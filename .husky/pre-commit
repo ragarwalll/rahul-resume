@@ -5,3 +5,4 @@ echo 'code scans running...'
 bun commit:lint
 bun run lint
 bun run build
+bun run format

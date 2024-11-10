@@ -77,7 +77,9 @@ class SectionConfig:
 class SubsectionConfig:
     """Configuration for subsection formatting"""
 
-    multicol_sep: str = "\\setlength{\\multicolsep}{0pt}%"
+    multicol_sep: str = (
+        "\\setlength{\\multicolsep}{\\dimexpr\\fpeval{-10 + (2 * \\spacingscale)}pt\\relax}%"
+    )
     multicol_begin: str = "\\begin{multicols}"
     multicol_end: str = "\\end{multicols}"
     default_columns: int = 1
@@ -106,11 +108,11 @@ class SpacingModel(Enum):
 
 
 @dataclass
-class LatexSizeModifier:
-    """Data class for LaTeX size modifier configuration"""
+class LatexScalingFactor:
+    """Data class for LaTeX scaling modifier configuration"""
 
-    begin: str = "{\\setstretch{spacing_here}\n\\begingroup"
-    end: str = "\\endgroup}"
+    begin: str = "\\begin{scalingfactor}{spacing_here}\n\\begingroup"
+    end: str = "\\endgroup\n\\end{scalingfactor}"
 
     def wrap(self, content: str, spacing: int) -> List[str]:
         """Wrap content with size modifier tags"""
@@ -220,7 +222,7 @@ class ListFormatConfig:
     bullet_env: str = ListStyle.BULLET.value
     no_bullet_env: str = ListStyle.NO_BULLET.value
     space_separator: str = " "
-    group_begin: str = "{\\setstretch{1}\n\\begingroup"
+    group_begin: str = "{\\begingroup"
     group_end: str = "\\endgroup}"
 
     def get_environment(self, show_bullets: bool) -> str:
@@ -342,6 +344,7 @@ class ResumeContentGenerator:
     def __init__(self, json_data: Dict[str, Any]):
         self.data = json_data
         self.space_separator = "\\space"
+        self.section_seperator = "\\sectionseperator"
         self.formatters = ContentFormatters(
             list_formatter=self.display_list,
             paragraph_formatter=self.display_paragraph,
@@ -579,7 +582,7 @@ class ResumeContentGenerator:
         ].value
         # Filter out empty strings and join with newlines
         return self.format_output_array(
-            LatexSizeModifier().wrap(
+            LatexScalingFactor().wrap(
                 "\n".join(filter(None, layout)),
                 spacing,
             )
@@ -687,9 +690,13 @@ class ResumeContentGenerator:
 
         # Process based on layout type
         if column_count == ColumnType.SINGLE.value:
-            return "\n".join(filter(None, process_single_column()))
+            return f"{self.section_seperator}%\n".join(
+                filter(None, process_single_column())
+            )
 
-        return "\n".join(filter(None, process_multi_column(column_count)))
+        return f"{self.section_seperator}%\n".join(
+            filter(None, process_multi_column(column_count))
+        )
 
     def process_single_subsection(
         self,

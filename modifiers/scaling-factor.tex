@@ -1,0 +1,9 @@
+% modifiers/scaling-factor.tex - Scaling factor for the PDF
+
+% Alternative environment-style definition
+\newenvironment{scalingfactor}[1]{%
+  \def\oldspacingscale{\spacingscale}% Save current scale
+  \def\spacingscale{#1}% Set new scale
+}{%
+  \def\spacingscale{\oldspacingscale}% Restore old scale
+}

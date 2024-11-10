@@ -82,9 +82,11 @@
 % This command loads the 'multicol' package which provides multi-column formatting
 \RequirePackage{multicol}
 
+\input{modifiers/scaling-factor.tex}
 
 % Command to apply all settings
 \newcommand{\applysettings}{
+  \def\spacingscale{1.0}% Default scaling factor
 
   % Apply the default modifers
   \input{modifiers/default.tex}

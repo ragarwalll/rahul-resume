@@ -12,8 +12,87 @@ permissions:
   contents: read
 
 jobs:
-  latex:
+  build:
     uses: ./.github/workflows/shared.yml
     with:
       main_document: resume.tex
       working_directory: "."
+  summarize:
+    needs: build
+    if: github.event_name == 'pull_request' && always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check if build failed
+            const buildSuccess = '${{ needs.build.result }}' === 'success';
+
+            // Get LaTeX build outputs if build was successful
+            const artifactUrl = '${{ needs.build.outputs.artifact_url }}' || '';
+
+            // Get format errors
+            const formatError = '${{ needs.build.outputs.format_errors }}' || 0;
+
+            // Get lint errors
+            const lintError = '${{ needs.build.outputs.lint_errors }}' || 0;
+
+            // Get lint warnings
+            const lintWarning = '${{ needs.build.outputs.lint_warnings }}' || 0;
+
+            // Get total files processed
+            const totalFiles = '${{ needs.build.outputs.total_files }}' || 0;
+
+            // Get python logs artifact url
+            const pythonLogsUrl = '${{ needs.build.outputs.python_logs_artifact_url }}' || '';
+
+            // Get python run status
+            const pythonRunStatus = '${{ needs.build.outputs.data_generated }}' || '';
+
+            let comment = `
+            &nbsp;&nbsp;→ \`total files processed\`: ${totalFiles}
+            &nbsp;&nbsp;→ \`pdf build status\`: ${buildSuccess ? 'success' : 'failure'}
+            &nbsp;&nbsp;→ \`processing by python\`: ${pythonRunStatus ? 'success' : 'failure'}
+            &nbsp;&nbsp;→ \`formatting issues\`: ${formatError}
+            &nbsp;&nbsp;→ \`linting issues\`: ${lintError}
+            &nbsp;&nbsp;→ \`linting warnings\`: ${lintWarning}
+            &nbsp;&nbsp;→ \`generated\`: [python logs](${pythonLogsUrl})`
+
+            if (buildSuccess) {
+              comment = `✓ pdf build was successful` + comment
+              comment += `
+              &nbsp;&nbsp;→ \`generated\`: [pdf build artifact](${artifactUrl})`
+            } else {
+              comment = `✗ pdf build failed` + comment
+            }
+
+            comment += `
+            &nbsp;&nbsp;→ \`view\`: [worflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+
+            // Find any existing comments by the bot
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('build');
+            });
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }

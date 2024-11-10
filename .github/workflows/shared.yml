@@ -19,7 +19,7 @@ on:
     outputs:
       data_generated:
         description: "Flag indicating if python data was generated"
-        value: ${{ jobs.python-processing.outputs.data_generated }}
+        value: ${{ jobs.python-check-and-build.outputs.data_generated }}
       format_errors:
         description: "Number of files with formatting errors"
         value: ${{ jobs.latex-check-and-build.outputs.format_errors }}
@@ -35,17 +35,20 @@ on:
       artifact_url:
         description: "URL to download the generated PDF"
         value: ${{ jobs.latex-check-and-build.outputs.artifact_url }}
+      python_logs_artifact_url:
+        description: "URL to download the Python logs"
+        value: ${{ jobs.python-check-and-build.outputs.python_logs_artifact_url }}
 
 permissions:
   actions: read
-  pull-requests: write
   contents: read
 
 jobs:
-  python-processing:
+  python-check-and-build:
     runs-on: ubuntu-latest
     outputs:
       data_generated: ${{ steps.python-run.outputs.data_generated }}
+      python_logs_artifact_url: ${{ steps.upload_python_logs.outputs.artifact-url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,17 +56,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.x"
           cache: "pip"
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            echo "⚠️ No requirements.txt found"
-          fi
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry --directory vitagen install
+
+      - name: Check formatting with black
+        run: poetry --directory vitagen run pylint **/*.py
+
+      - name: Check formatting with black
+        run: poetry --directory vitagen run black --check .
 
       - name: Download Generated TEX
         if: ${{ inputs.artifact-name != '' }}
@@ -75,22 +81,39 @@ jobs:
       - name: Run Python script
         id: python-run
         run: |
-          echo "Running Python processing..."
-          if [ -f processor/python/main.py ]; then
-            python processor/python/main.py --input data.json --output processor/python-data.tex
-            if [ -f processor/python-data.tex ]; then
-              echo "data_generated=true" >> $GITHUB_OUTPUT
-              echo "✅ Successfully generated python-data.tex"
-            else
-              echo "❌ python-data.tex was not generated"
-              echo "data_generated=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
+          # Create log directory if it doesn't exist
+          mkdir -p logs
+          {
+            poetry --directory vitagen run start-module --input data.json --output processor/python-data.tex
+          } 2>&1 | tee logs/python_script.log
+
+          poetry --directory vitagen run start-module --input data.json --output processor/python-data.tex
+
+          if [ -f processor/python-data.tex ]; then
+            echo "data_generated=true" >> $GITHUB_OUTPUT
+            
+            # Upload success logs as artifact
+            echo "logs_path=logs/python_script.log" >> $GITHUB_OUTPUT
+            
+            echo "✅ Successfully generated python-data.tex"
           else
-            echo "❌ processor/python/main.py not found"
+            echo "❌ python-data.tex was not generated"
             echo "data_generated=false" >> $GITHUB_OUTPUT
+            
+            # Upload failure logs as artifact
+            echo "logs_path=logs/python_script.log" >> $GITHUB_OUTPUT
+
             exit 1
           fi
+
+      - name: Upload logs
+        if: always()
+        id: upload_python_logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-script-logs
+          path: logs/python_script.log
+          retention-days: 7
 
       - name: Upload Generated TEX
         if: steps.python-run.outputs.data_generated == 'true'
@@ -98,18 +121,17 @@ jobs:
         with:
           name: python-data-tex
           path: processor/python-data.tex
+          retention-days: 7
 
       - name: Generate Python Summary
         if: always()
         run: |
-          echo "# 🐍 Python Processing Report" >> $GITHUB_STEP_SUMMARY
-
           if [ "${{ steps.python-run.outputs.data_generated }}" == "true" ]; then
-            echo "### ✅ Python Processing Status: Successful" >> $GITHUB_STEP_SUMMARY
-            echo "- Successfully generated python-data.tex at processor/python-data.tex" >> $GITHUB_STEP_SUMMARY
+            echo "✓ python run was successful" >> $GITHUB_STEP_SUMMARY
+            echo "&nbsp;&nbsp;→ \`generated\`: processor/python-data.tex" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### ❌ Python Processing Status: Failed" >> $GITHUB_STEP_SUMMARY
-            echo "- Failed to generate python-data.tex" >> $GITHUB_STEP_SUMMARY
+            echo "✗ python run was unsuccessful" >> $GITHUB_STEP_SUMMARY
+            echo "&nbsp;&nbsp;→ \`cause\`: failed to generate processor/python-data.tex" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload Python logs on failure
@@ -118,11 +140,12 @@ jobs:
         with:
           name: python-logs
           path: |
-            processor/python/*.log
+            vitagen/vitagen/*.log
             ./*.log
+          retention-days: 7
 
   latex-check-and-build:
-    needs: [python-processing]
+    needs: [python-check-and-build]
     runs-on: ubuntu-latest
     outputs:
       format_errors: ${{ steps.format.outputs.format_errors }}
@@ -286,6 +309,7 @@ jobs:
           name: pdf-output
           path: ${{ inputs.working_directory }}/*.pdf
           if-no-files-found: error
+          retention-days: 7
 
       - name: Generate Build Summary
         if: always()
@@ -294,136 +318,33 @@ jobs:
           LINT_ERRORS: ${{ steps.lint.outputs.lint_errors }}
           LINT_WARNINGS: ${{ steps.lint.outputs.lint_warnings }}
           PDF_EXIT_CONCLUSION: ${{ steps.build-pdf.conclusion }}
-          PYTHON_STATUS: ${{ needs.python-processing.outputs.data_generated }}
+          PYTHON_STATUS: ${{ needs.python-check-and-build.outputs.data_generated }}
+          TOTAL_FILES: ${{ steps.find-tex.outputs.file_count }}
         run: |
-          echo "# 📑 LaTeX Build Report" >> $GITHUB_STEP_SUMMARY
-
           # Add status banner
           if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ] && [ "$PYTHON_STATUS" = "true" ]; then
-            echo "### ✅ Build Status: Successful" >> $GITHUB_STEP_SUMMARY
+            echo "✓ pdf build was successful" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### ❌ Build Status: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "✗ pdf build failed" >> $GITHUB_STEP_SUMMARY
           fi
 
-          echo "## 📊 Processing Statistics" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Count | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Files Processed | ${{ needs.format-and-lint.outputs.total_files }} | ℹ️ |" >> $GITHUB_STEP_SUMMARY
-
-          if [ "$PDF_EXIT_CONCLUSION" = "success" ]; then
-            echo "| PDF Build | - | ✅ |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| PDF Build Issue | 1 | ❌ |" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "&nbsp;&nbsp;→ \`total files processed\`: $TOTAL_FILES" >> $GITHUB_STEP_SUMMARY
+          echo "&nbsp;&nbsp;→ \`pdf build status\`: $PDF_EXIT_CONCLUSION" >> $GITHUB_STEP_SUMMARY
 
           if [ "$PYTHON_STATUS" = "true" ]; then
-            echo "| Python Processing | - | ✅ |" >> $GITHUB_STEP_SUMMARY
+            echo "&nbsp;&nbsp;→ \`processing by python\`: success" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| Python Processing | Failed | ❌ |" >> $GITHUB_STEP_SUMMARY
+            echo "&nbsp;&nbsp;→ \`processing by python\`: failed" >> $GITHUB_STEP_SUMMARY
           fi
 
-          if [ "$FORMAT_ERRORS" = "0" ]; then
-            echo "| Formatting Issues | 0 | ✅ |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Formatting Issues | $FORMAT_ERRORS | ❌ |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "$LINT_ERRORS" = "0" ]; then
-            echo "| Linting Errors | 0 | ✅ |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Linting Errors | $LINT_ERRORS | ❌ |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "$LINT_WARNINGS" = "0" ]; then
-            echo "| Linting Warnings | 0 | ✅ |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Linting Warnings | $LINT_WARNINGS | ⚠️ |" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "&nbsp;&nbsp;→ \`formatting issues\`: $FORMAT_ERRORS" >> $GITHUB_STEP_SUMMARY
+          echo "&nbsp;&nbsp;→ \`linting issues\`: $LINT_ERRORS" >> $GITHUB_STEP_SUMMARY
+          echo "&nbsp;&nbsp;→ \`linting issues\`: $LINT_ERRORS" >> $GITHUB_STEP_SUMMARY
+          echo "&nbsp;&nbsp;→ \`linting warnings\`: $LINT_WARNINGS" >> $GITHUB_STEP_SUMMARY
 
           if [ "$FORMAT_ERRORS" = "0" ] && [ "$LINT_ERRORS" = "0" ] && [ "$LINT_WARNINGS" = "0" ] && [ "$PDF_EXIT_CONCLUSION" = "success" ] && [ "$PYTHON_STATUS" = "true" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "## 📋 Build Artifacts" >> $GITHUB_STEP_SUMMARY
-            echo "✅ PDF has been generated successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- The generated PDF is available in the workflow artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "&nbsp;&nbsp;→ \`generated\`: pdf build artifact" >> $GITHUB_STEP_SUMMARY
           fi
-
-      - name: Comment on PR
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const artifactName = 'pdf-output';
-            const formatErrors = parseInt('${{ steps.format.outputs.format_errors }}') || 0;
-            const lintErrors = parseInt('${{ steps.lint.outputs.lint_errors }}') || 0;
-            const lintWarnings = parseInt('${{ steps.lint.outputs.lint_warnings }}') || 0;
-            const buildPdfFailed = '${{ steps.build-pdf.conclusion }}' === 'failure' ? 1 : 0;
-            const pythonFailed = '${{ needs.python-processing.outputs.data_generated }}' !== 'true' ? 1 : 0;
-
-            let status = '✅ Build Successful';
-            let color = '0E8A16'; // green
-            let details = '';
-
-            if (formatErrors > 0 || lintErrors > 0 || lintWarnings > 0 || buildPdfFailed > 0 || pythonFailed > 0) {
-              status = '❌ Build Failed';
-              color = 'D93F0B'; // red
-              details = `
-              ### Build Statistics
-              - Total files processed: ${{ needs.format-and-lint.outputs.total_files }}
-              - Python processing status: ${pythonFailed ? 'Failed' : 'Successful'}
-              - PDF generation status: ${buildPdfFailed ? 'Failed' : 'Successful'}
-              - Files with formatting issues: ${formatErrors}
-              - Files with lint errors: ${lintErrors}
-              - Files with lint warnings: ${lintWarnings}
-              
-              Please check the workflow logs for detailed error messages.
-              `;
-            } else {
-              const artifactUrl = '${{ steps.upload_pdf.outputs.artifact-url }}';
-              details = `
-              ### 📄 PDF has been generated successfully!
-
-              🔗 [Download PDF](${artifactUrl})
-              
-              ### Build Statistics
-              - Total files processed: ${{ needs.format-and-lint.outputs.total_files }}
-              - Python processing completed ✅
-              - All formatting checks passed ✅
-              - All lint checks passed ✅
-              `;
-            }
-
-            const comment = `## ${status}
-
-            ${details}
-
-            [View full workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
-
-            // Find any existing comments by the bot
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const botComment = comments.find(comment => {
-              return comment.user.type === 'Bot' && comment.body.includes('Build');
-            });
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: comment
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: comment
-              });
-            }
 
       - name: Upload logs on failure
         if: ${{ failure() || steps.build-pdf.conclusion == 'failure' }}

@@ -7,12 +7,11 @@ on:
 permissions:
   actions: read
   issues: write
-  pull-requests: write
   contents: read
 
 jobs:
   process-trigger:
-    if: contains(github.event.comment.body, '/trigger')
+    if: contains(github.event.comment.body, '/trigger') && github.event.issue.pull_request == null
     runs-on: ubuntu-latest
     outputs:
       file_found: ${{ steps.extract.outputs.status }}
@@ -180,7 +179,7 @@ jobs:
 
   build:
     needs: process-trigger
-    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }}
+    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }} && github.event.issue.pull_request == null
     uses: ./.github/workflows/shared.yml
     with:
       artifact-name: "data-json"
@@ -188,14 +187,14 @@ jobs:
       working_directory: "."
   summarize:
     needs: build
-    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }}
+    if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }} && github.event.issue.pull_request == null
     runs-on: ubuntu-latest
     steps:
       - name: Find and update comment
         uses: actions/github-script@v7
         with:
           script: |
-            // Check if process-trigger job failed
+            // Check if build failed
             const buildSuccess = '${{ needs.build.result }}' === 'success';
 
             // Get LaTeX build outputs if build was successful

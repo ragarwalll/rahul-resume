@@ -3,6 +3,7 @@
 import os
 import json
 import logging
+from typing import Any, Dict
 import structlog
 from pygments import highlight
 from pygments.lexers import JsonLexer  # pylint: disable=no-name-in-module
@@ -10,6 +11,35 @@ from pygments.formatters import TerminalFormatter  # pylint: disable=no-name-in-
 from vitagen.constants import CONFIG_LOG_LEVEL, ENV_LOG_PRETTY
 
 __all__ = ["configure_logging", "get_logger"]
+
+
+def order_fields(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Processor to order fields in the log output.
+    Ensures timestamp, level, and msg appear first in that order.
+    """
+    # Create a new ordered dict with the fields in desired order
+    ordered = {}
+
+    # First add timestamp if it exists
+    if "timestamp" in event_dict:
+        ordered["timestamp"] = event_dict.pop("timestamp")
+
+    # Then add level if it exists
+    if "level" in event_dict:
+        ordered["level"] = event_dict.pop("level")
+
+    if "logger" in event_dict:
+        ordered["logger"] = event_dict.pop("logger")
+
+    # Then add msg if it exists
+    if "msg" in event_dict:
+        ordered["msg"] = event_dict.pop("msg")
+
+    # Add all remaining fields
+    ordered.update(event_dict)
+
+    return ordered
 
 
 def set_logger(_, __, event_dict):
@@ -27,6 +57,7 @@ def configure_logging():
         structlog.processors.TimeStamper(fmt="iso"),
         set_logger,
         structlog.processors.EventRenamer("msg"),
+        order_fields,
     )
 
     # get the log level from the configuration
@@ -34,7 +65,7 @@ def configure_logging():
     log_level = getattr(logging, level)
 
     # get pretty print is enabled or not
-    pretty_print = os.environ.get(ENV_LOG_PRETTY, "false") == "true"
+    pretty_print = os.environ.get(ENV_LOG_PRETTY, "False") == "True"
 
     # if pretty print is enabled, add JSONRenderer with colored_json_serializer
     if pretty_print:

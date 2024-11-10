@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from typing import Union
+from dotenv import load_dotenv
 from .logger.struct_json_logger import configure_logging, get_logger
 from .constants import (
     ERROR_PROVIDE_A_VALID_JSON_FILE_PATH,
@@ -13,6 +14,7 @@ from .generator.main import ResumeContentGenerator
 
 __all__ = ["start"]
 
+load_dotenv()
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--input", help="path to the JSON file")

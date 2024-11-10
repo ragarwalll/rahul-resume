@@ -3,6 +3,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Optional
+from structlog import BoundLogger
 
 __all__ = ["ContentType", "ContentFormatters"]
 
@@ -20,10 +21,10 @@ class ContentType(Enum):
 class ContentFormatters:
     """Formatters for different content types"""
 
-    list_formatter: Callable[[Dict[str, Any]], str]
-    paragraph_formatter: Callable[[Dict[str, Any]], str]
-    table_formatter: Callable[[Dict[str, Any]], str]
-    inline_list_formatter: Optional[Callable[[Dict[str, Any]], str]] = None
+    list_formatter: Callable[[Dict[str, Any], BoundLogger], str]
+    paragraph_formatter: Callable[[Dict[str, Any], BoundLogger], str]
+    table_formatter: Callable[[Dict[str, Any], BoundLogger], str]
+    inline_list_formatter: Optional[Callable[[Dict[str, Any], BoundLogger], str]] = None
 
     def get_formatter(self, content_type: str) -> Callable:
         """Get appropriate formatter for content type"""

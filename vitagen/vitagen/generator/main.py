@@ -1,10 +1,12 @@
-"""Main module for resume content generation."""
+# pylint: disable=too-many-lines
+"""Main module for resume content generation."""  # noqa: D301
 
 import re
 from functools import lru_cache, reduce
 from itertools import groupby
 from operator import itemgetter
 from typing import Any, Dict, List, Optional, Union, Final, Set, Iterator
+from structlog import BoundLogger
 from vitagen.generator.config.base import (
     StyleConfig,
     ColumnType,
@@ -22,6 +24,7 @@ from vitagen.generator.config.additional_info import AdditionalInfoConfig
 from vitagen.generator.config.info import InfoFormatConfig
 from vitagen.generator.config.spacing_factor import SpacingModel, LatexScalingFactor
 from vitagen.generator.config.column import LatexColumn
+from vitagen.logger.struct_json_logger import get_logger
 
 __all__ = ["ResumeContentGenerator"]
 
@@ -31,6 +34,7 @@ class ResumeContentGenerator:
 
     def __init__(self, json_data: Dict[str, Any]):
         self.data = json_data
+        self.logger = get_logger("vitagen")
         self.space_separator = "\\space"
         self.section_seperator = "\\sectionseperator"
         self.formatters = ContentFormatters(
@@ -39,6 +43,8 @@ class ResumeContentGenerator:
             inline_list_formatter=self.display_inline_list,
             table_formatter=self.display_table,
         )
+
+        self.logger.info("resume content generator initialized.")
 
     def escape_latex(
         self, text: str, custom_chars: dict[str, str] | None = None
@@ -153,11 +159,19 @@ class ResumeContentGenerator:
         # if lets say the first name is missing,
         # the full name will be the middle name and last name
         # with self.space_separator in between
+        self.logger.info("found first name", value=first_name)
         if middle_name:
+            self.logger.info("found middle name", value=middle_name)
             first_name = f"{first_name} {middle_name}"
+        else:
+            self.logger.warning("no middle name found")
+
+        self.logger.info("found last name", value=last_name)
 
         if self.data.get("links"):
             links = self.process_links(self.data.get("links", []))
+        else:
+            self.logger.warning("no links found")
 
         output.append(
             f"\\namesection{{{first_name}}}{{{last_name}}}{{\\urlstyle{{same}}{links}}}"
@@ -180,6 +194,7 @@ class ResumeContentGenerator:
             return ""
 
         # Convert links to (column, formatted_link) tuples with default column=1
+        self.logger.info("found links", total=len(links))
         formatted_links = [
             (link.get("column", 1), f'\\href{{{link["href"]}}}{{{link["text"]}}}')
             for link in links
@@ -230,6 +245,8 @@ class ResumeContentGenerator:
         if not sections:
             return ""
 
+        self.logger.info("found sections", total=len(sections))
+
         def get_column(section: Dict) -> int:
             """Get section column number with default to 1"""
             return section.get("column", ColumnType.SINGLE.value)
@@ -241,7 +258,10 @@ class ResumeContentGenerator:
 
         # Single column layout processing
         if not is_multi_column:
+            self.logger.info("using single column layout")
             return "\n" + "".join(map(process_section, sections))
+
+        self.logger.info("using multi-column layout")
 
         # Setup multi-column configuration
         col_config = LatexColumn(ratio=golden_ratio)
@@ -251,6 +271,15 @@ class ResumeContentGenerator:
         sections_by_column = {
             col: list(group) for col, group in groupby(sorted_sections, key=get_column)
         }
+
+        # log how many sections are there for each column
+        self.logger.info(
+            "sections grouped by column",
+            **{
+                f"in_col_{col}": len(sections)
+                for col, sections in sections_by_column.items()
+            },
+        )
 
         # Build multi-column layout
         layout = [
@@ -270,6 +299,12 @@ class ResumeContentGenerator:
         spacing = SpacingModel[
             self.data.get("spacing", SpacingModel.NORMAL.name).upper()
         ].value
+
+        self.logger.info(
+            "using spacing factor",
+            value=self.data.get("spacing", SpacingModel.NORMAL.name),
+        )
+
         # Filter out empty strings and join with newlines
         return self.format_output_array(
             LatexScalingFactor().wrap(
@@ -292,9 +327,17 @@ class ResumeContentGenerator:
         # Use default config if none provided
         config = config or SectionConfig()
 
+        # create a new logger for the section
+        # with the section title as the name
+        logger = self.logger.bind(section_title=section.get("heading", ""))
+        logger.info("processing section")
+
         # Get appropriate minipage environment based on width
         is_full_width = section.get("fullWidth", False)
         minipage_env = config.minipage.get_environment(is_full_width)
+
+        if is_full_width:
+            logger.info("using full width")
 
         def build_section() -> List[str]:
             """Build section components"""
@@ -309,11 +352,12 @@ class ResumeContentGenerator:
 
             # Process subsections if available
             if section.get("subsections"):
-                components.append(self.process_subsections(section))
+                components.append(self.process_subsections(section, logger))
 
             # Add content if available
             if section.get("content"):
-                components.append(self.display_content(section.get("content")))
+                logger.info("processing section content")
+                components.append(self.display_content(section.get("content"), logger))
 
             # Add closing tags
             components.extend([config.group.end, config.separator, minipage_env.end])
@@ -326,6 +370,7 @@ class ResumeContentGenerator:
     def process_subsections(
         self,
         section: Dict[str, Any],
+        logger: BoundLogger,
         config: Optional[SubsectionConfig] = None,
     ) -> str:
         """
@@ -333,6 +378,7 @@ class ResumeContentGenerator:
 
         Args:
             section: Section data containing subsections and column settings
+            logger: Logger for the section
             config: Optional subsection configuration
 
         Returns:
@@ -355,11 +401,12 @@ class ResumeContentGenerator:
 
         # Use default config if none provided
         config = config or SubsectionConfig()
+        logger.info("found subsections", total=len(subsections))
 
         def process_single_column() -> Iterator[str]:
             """Process subsections in single column layout"""
             return (
-                self.process_single_subsection(subsection, with_mini_page=False)
+                self.process_single_subsection(subsection, logger, with_mini_page=False)
                 for subsection in subsections
             )
 
@@ -369,7 +416,9 @@ class ResumeContentGenerator:
                 config.multicol_sep,
                 f"{config.multicol_begin}{{{num_columns}}}",
                 *[
-                    self.process_single_subsection(subsection, with_mini_page=True)
+                    self.process_single_subsection(
+                        subsection, logger, with_mini_page=True
+                    )
                     for subsection in subsections
                 ],
                 config.multicol_end,
@@ -379,6 +428,10 @@ class ResumeContentGenerator:
         column_count = config.get_column_settings(section)
 
         # Process based on layout type
+        logger.info(
+            "found layout type for subsection items",
+            subsection_column_count=column_count,
+        )
         if column_count == ColumnType.SINGLE.value:
             return f"{self.section_seperator}%\n".join(
                 filter(None, process_single_column())
@@ -391,6 +444,7 @@ class ResumeContentGenerator:
     def process_single_subsection(
         self,
         subsection: Dict[str, Any],
+        logger: BoundLogger,
         with_mini_page: bool = False,
         elements: Optional[SubsectionElements] = None,
     ) -> str:
@@ -399,6 +453,7 @@ class ResumeContentGenerator:
 
         Args:
             subsection: Subsection data including heading, info, content and metadata
+            logger: Logger for the section
             with_mini_page: Whether to wrap content in minipage environment
             elements: Optional subsection elements configuration
 
@@ -421,6 +476,7 @@ class ResumeContentGenerator:
 
         def build_subsection() -> List[str]:
             """Build subsection components"""
+            new_logger = logger
             components = [elements.group[0]]  # Begin group
 
             # Add minipage if requested
@@ -429,28 +485,47 @@ class ResumeContentGenerator:
 
             # Process heading
             if heading := self.escape_latex(subsection.get("heading", "")):
+                new_logger = logger.bind(
+                    subsection_heading=subsection.get("heading", "")
+                )
+                new_logger.info("processing subsection")
+
+                # Add heading
                 components.append(elements.heading_format.format(heading))
 
             # Process info block
             if title := subsection.get("info", {}).get("title"):
-                components.append(
-                    self.display_info(
-                        title,
-                        same_line=subsection.get("info", {}).get("sameLine", False),
-                    )
+                same_line = subsection.get("info", {}).get("sameLine", False)
+                new_logger.info(
+                    "processing info block", info_title=title, show_same_line=same_line
                 )
+
+                # Add info block
+                components.append(self.display_info(title, same_line=same_line))
 
             # Process metadata
             if metadata := subsection.get("metadata", {}):
-                components.append(
-                    self.display_additional_info(
-                        metadata.get("location", ""), metadata.get("duration", "")
+                # check if location or duration is present
+                if metadata.get("location") or metadata.get("duration"):
+                    new_logger.info(
+                        "processing metadata",
+                        location=metadata.get("location"),
+                        duration=metadata.get("duration"),
                     )
-                )
+
+                    # Add additional info
+                    components.append(
+                        self.display_additional_info(
+                            metadata.get("location", ""), metadata.get("duration", "")
+                        )
+                    )
 
             # Process content
             if content := subsection.get("content"):
-                components.append(self.display_content(content))
+                new_logger.info("processing subsection content")
+                components.append(self.display_content(content, new_logger))
+            else:
+                new_logger.warning("no subsection content found")
 
             # Close environments
             if with_mini_page:
@@ -577,6 +652,7 @@ class ResumeContentGenerator:
     def display_content(
         self,
         content: Union[Dict[str, Any], List[str]],
+        logger: BoundLogger,
         default_type: str = ContentType.LIST.value,
     ) -> str:
         """
@@ -584,6 +660,7 @@ class ResumeContentGenerator:
 
         Args:
             content: Content dictionary with type and data or direct list of items
+            logger: Logger for the section
             default_type: Default content type if not specified
 
         Returns:
@@ -612,19 +689,25 @@ class ResumeContentGenerator:
         def format_content() -> str:
             """Format content using appropriate formatter"""
             content_type = content.get("type", default_type)
+
+            new_logger = logger.bind(content_type=content_type)
             formatter = formatters.get_formatter(content_type)
-            return formatter(content)
+            return formatter(content, new_logger)
 
         return format_content()
 
     def display_table(
-        self, content: Dict[str, Any], config: Optional[TableConfig] = None
+        self,
+        content: Dict[str, Any],
+        logger: BoundLogger,
+        config: Optional[TableConfig] = None,
     ):
         """
         Display table content with rows and columns.
 
         Args:
             content: Table content with rows and columns
+            logger: Logger for the section
             config: Optional table formatting configuration
 
         Returns:
@@ -639,6 +722,8 @@ class ResumeContentGenerator:
             if not (rows := content.get("rows", [])):
                 return ""
 
+            logger.info("found table rows", total=len(rows))
+
             # Build table
             return config.wrap_in_environment(
                 config.format_table(rows, self.escape_latex)
@@ -649,6 +734,7 @@ class ResumeContentGenerator:
     def display_list(
         self,
         content: Dict[str, Any],
+        logger: BoundLogger,
         config: Optional[ListFormatConfig] = None,
     ) -> str:
         """
@@ -656,6 +742,7 @@ class ResumeContentGenerator:
 
         Args:
             content: List content with items, bullet settings and inline lists
+            logger: Logger for the section
             config: Optional list formatting configuration
 
         Returns:
@@ -696,14 +783,21 @@ class ResumeContentGenerator:
 
             # Add segments if present
             if segments := item.get("segments"):
+                logger.info("found segments", total_segments=len(segments))
                 components.append(format_segments(segments))
+            else:
+                logger.warning("no segments found")
 
             # Add environment end
             components.append(f"\\end{{{env}}}")
 
             # Add inline list if present
             if inline_list := item.get("inlineList"):
-                components.append(self.display_inline_list(inline_list))
+                components.append(
+                    self.display_inline_list(
+                        inline_list, logger.bind(content_type="inline_list")
+                    )
+                )
                 # components.append("\n")
 
             return "\n".join(filter(None, components))
@@ -712,6 +806,9 @@ class ResumeContentGenerator:
             """Build complete list with all items"""
             if not (items := content.get("items", [])):
                 return ""
+
+            show_bullets = content.get("style", {}).get("showBullets", True)
+            logger.info("found list items", total=len(items), show_bullets=show_bullets)
 
             # Process all items
             processed_items = [*[process_list_item(item) for item in items]]
@@ -729,13 +826,17 @@ class ResumeContentGenerator:
         return build_list()
 
     def display_inline_list(
-        self, inline_list: Dict[str, Any], config: Optional[InlineListConfig] = None
+        self,
+        inline_list: Dict[str, Any],
+        logger: BoundLogger,
+        config: Optional[InlineListConfig] = None,
     ) -> str:
         """
         Display items as inline list with custom separator.
 
         Args:
             inline_list: Dictionary containing items and separator
+            logger: Logger for the section
             config: Optional formatting configuration
 
         Returns:
@@ -778,6 +879,11 @@ class ResumeContentGenerator:
             items = inline_list.get("items", [])
             separator = inline_list.get("separator", config.default_separator)
 
+            logger.info(
+                "found inline list items",
+                total_inline_list=len(items),
+                inline_list_separator=separator,
+            )
             # Format list
             formatted_list = format_list(items, separator)
 
@@ -851,6 +957,7 @@ class ResumeContentGenerator:
     def display_paragraph(
         self,
         content: Dict[str, Any],
+        logger: BoundLogger,
         config: Optional[ParagraphConfig] = None,
     ) -> str:
         """
@@ -858,6 +965,7 @@ class ResumeContentGenerator:
 
         Args:
             content: Paragraph data with text and optional href
+            logger: Logger for the section
             config: Optional paragraph formatting configuration
 
         Returns:
@@ -899,6 +1007,13 @@ class ResumeContentGenerator:
             text = content.get("text", "")
             href = content.get("href")
 
+            if not href:
+                logger.info("found paragraph text", para_text=text)
+            else:
+                logger.info(
+                    "found paragraph text with hyperlink", para_text=text, href=href
+                )
+
             # Format text with hyperlink if present
             formatted_text = format_paragraph_text(text, href)
 
@@ -911,27 +1026,27 @@ class ResumeContentGenerator:
         """Build resume content."""
         output = ["% chktex-file 6", "% chktex-file 36"]
 
-        output.append("% ============ Display Presets ============")
         preset = self.get_value("preset")
         if preset:
+            self.logger.info(f"using preset: {preset}", preset=preset)
             output.append(f"\\loadpresent{{{preset}}}")
         else:
+            self.logger.info("using default preset", preset="deedy-inspired-open-fonts")
             output.append("\\loadpresent{deedy-inspired-open-fonts}")
 
-        output.append("% ======== Display Last Updated ==========")
         if self.data.get("showLastUpdated", True):
             output.append("\\lastupdated%")
 
         # process name section
-        output.append("% ============ Display Header ============")
         output.append(self.process_header_sections())
+        self.logger.info("processed header section")
 
         # process sections
-        output.append("% ============ Display Sections ============")
         output.append(
             self.process_sections(
                 self.get_value("resume.sections"), self.process_single_section
             )
         )
+        self.logger.info("processed sections")
 
         return self.format_output_array(output)

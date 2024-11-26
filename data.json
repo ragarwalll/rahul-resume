@@ -304,17 +304,6 @@
                       "Shell"
                     ]
                   }
-                },
-                {
-                  "segments": [
-                    {
-                      "text": "Over 1000 lines:"
-                    }
-                  ],
-                  "inlineList": {
-                    "separator": "•",
-                    "items": ["C", "C++", "CSS", "PHP", "Assembly"]
-                  }
                 }
               ]
             }

@@ -1,5 +1,5 @@
 ---
-name: new-resume
+name: Generate Resume
 about: Resume generator using data.json
 title: Create a new resume
 labels: prepare-resume

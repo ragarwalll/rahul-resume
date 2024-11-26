@@ -3,6 +3,8 @@
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
+  "preset": "carlito",
+  "spacing": "high_dense",
   "showLastUpdated": true,
   "links": [
     {
@@ -90,7 +92,8 @@
                       "text": "VS Code extension",
                       "href": "https://marketplace.visualstudio.com/items?itemName=ragarwal06.create-sap-fs-app-vsix",
                       "style": {
-                        "bold": true
+                        "bold": true,
+                        "underline": true
                       }
                     },
                     {
@@ -216,7 +219,8 @@
                   "text": "VitaGen,",
                   "href": "https://therahulagarwal.com/rahul-resume",
                   "style": {
-                    "bold": true
+                    "bold": true,
+                    "underline": true
                   }
                 },
                 {
@@ -233,7 +237,8 @@
                   "text": "Rotaract Club of Kolkata.",
                   "href": "https://github.com/ragarwalll/rotaractheritage",
                   "style": {
-                    "bold": true
+                    "bold": true,
+                    "underline": true
                   }
                 }
               ]

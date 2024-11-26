@@ -107,6 +107,10 @@ Please find the schema for the `data.json` file below.
         - `carlito`
         - `montserrat`
 
+    !!! information "Suggestion"
+
+          If you are generating the resume for ATS, it is advisable to use the `carlito` preset.
+
 === ":material-format-paragraph-spacing: Spacing"
 
     ```{ .json .copy .select .annotate hl_lines="4"}
@@ -648,10 +652,6 @@ Following are the supported styles.
   "underline": true|false,
 }
 ```
-
-!!! warning "Note"
-
-      Please use `underline` with caution as some ATS might not read it properly.
 
 #### Inline List
 

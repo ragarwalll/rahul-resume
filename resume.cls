@@ -67,9 +67,6 @@
 % This command loads the 'paracol' package which provides multi-column formatting
 \RequirePackage{paracol}
 
-% This command loads the 'ulem' package which provides underline formatting
-\RequirePackage{ulem}
-
 % enable the following
 % system fonts (TTF/OTF)
 % Extra features for XeLaTeX

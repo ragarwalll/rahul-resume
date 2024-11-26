@@ -58,7 +58,7 @@ class StyleConfig:
         default_factory=lambda: {
             TextStyle.BOLD: "\\bfseries",
             TextStyle.ITALIC: "\\itshape",
-            TextStyle.UNDERLINE: "\\dotuline",
+            TextStyle.UNDERLINE: "\\underline",
         }
     )
     href_format: str = "\\href{{{}}}{{{}}}"

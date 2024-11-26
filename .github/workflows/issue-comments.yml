@@ -155,7 +155,7 @@ jobs:
         with:
           name: data-json
           path: data.json
-          retention-days: 5
+          retention-days: 7
 
       - name: Update comment on upload failure
         if: ${{ steps.download.outputs.status == 'success' && steps.upload.outputs.uploaded == 'false' }}
@@ -182,9 +182,9 @@ jobs:
     if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }} && github.event.issue.pull_request == null
     uses: ./.github/workflows/shared.yml
     with:
-      artifact-name: "data-json"
+      artifact-name: 'data-json'
       main_document: resume.tex
-      working_directory: "."
+      working_directory: '.'
   summarize:
     needs: build
     if: ${{ needs.process-trigger.outputs.file_found == 'success' && needs.process-trigger.outputs.file_upload == 'success' }} && github.event.issue.pull_request == null
@@ -226,7 +226,8 @@ jobs:
             @${context.payload.comment.user.login} ✓ build successful
             &nbsp;&nbsp;→ \`download pdf\`: [resume.pdf](${artifactUrl})
             &nbsp;&nbsp;→ \`enjoy?\` consider starring ⭐
-            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+            &nbsp;&nbsp;→ [\`view build\`](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            &nbsp;&nbsp;→ \`note\`: the pdf will be available for 7 days`;
             }
 
             // Find existing comment

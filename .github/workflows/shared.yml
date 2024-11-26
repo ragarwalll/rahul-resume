@@ -4,39 +4,39 @@ on:
   workflow_call:
     inputs:
       main_document:
-        description: "Main LaTeX document to build"
+        description: 'Main LaTeX document to build'
         required: true
         type: string
       working_directory:
-        description: "Directory containing LaTeX files"
+        description: 'Directory containing LaTeX files'
         required: false
-        default: "."
+        default: '.'
         type: string
       artifact-name:
-        description: "Name of the artifact to download"
+        description: 'Name of the artifact to download'
         required: false
         type: string
     outputs:
       data_generated:
-        description: "Flag indicating if python data was generated"
+        description: 'Flag indicating if python data was generated'
         value: ${{ jobs.python-check-and-build.outputs.data_generated }}
       format_errors:
-        description: "Number of files with formatting errors"
+        description: 'Number of files with formatting errors'
         value: ${{ jobs.latex-check-and-build.outputs.format_errors }}
       lint_errors:
-        description: "Number of files with linting errors"
+        description: 'Number of files with linting errors'
         value: ${{ jobs.latex-check-and-build.outputs.lint_errors }}
       lint_warnings:
-        description: "Number of files with linting warnings"
+        description: 'Number of files with linting warnings'
         value: ${{ jobs.latex-check-and-build.outputs.lint_warnings }}
       total_files:
-        description: "Total number of files processed"
+        description: 'Total number of files processed'
         value: ${{ jobs.latex-check-and-build.outputs.total_files }}
       artifact_url:
-        description: "URL to download the generated PDF"
+        description: 'URL to download the generated PDF'
         value: ${{ jobs.latex-check-and-build.outputs.artifact_url }}
       python_logs_artifact_url:
-        description: "URL to download the Python logs"
+        description: 'URL to download the Python logs'
         value: ${{ jobs.python-check-and-build.outputs.python_logs_artifact_url }}
 
 permissions:
@@ -56,8 +56,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
-          cache: "pip"
+          python-version: '3.x'
+          cache: 'pip'
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -354,3 +354,4 @@ jobs:
           path: |
             ${{ inputs.working_directory }}/*.log
             ${{ inputs.working_directory }}/lint_*.log
+          retention-days: 7

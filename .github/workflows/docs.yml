@@ -5,7 +5,7 @@ on:
       - main
     paths:
       - 'docs/**'
-  # Allow manual trigger
+
   workflow_dispatch:
 
 permissions:

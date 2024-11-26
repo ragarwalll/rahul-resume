@@ -1,0 +1,129 @@
+site_name: Rahul's Resume Generator
+site_url: https://therahulagarwal.com/rahul-resume/
+site_author: ragarwalll
+site_description: A simple resume generator created by Rahul Agarwal & inspired by the work of @deedy
+
+repo_url: https://github.com/ragarwalll/rahul-resume
+repo_name: ragarwalll/rahul-resume
+edit_uri: edit/main/docs/docs
+docs_dir: docs
+
+nav:
+  - index.md
+  - Getting Started:
+      - Usage: getting-started/usage.md
+      - About data.json: getting-started/data-json.md
+      - Examples: getting-started/examples.md
+  - More for Nerds:
+      - Architecture: nerds/architecture.md
+      - LaTeX Engine: nerds/latex.md
+      - Theming: nerds/theming.md
+  - Author:
+      - About Me: https://therahulagarwal.com
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  custom_dir: docs/.overrides
+  language: en
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.instant
+    - navigation.footer
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.tabs.link
+
+plugins:
+  - social
+  - privacy
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
+  - git-committers:
+      enabled: true
+      repository: ragarwalll/rahul-resume
+      branch: main
+      token: !ENV [GITHUB_TOKEN, '']
+  - offline
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ragarwalll/rahul-resume
+  version:
+    provider: mike
+  consent:
+    title: Cookie consent
+    actions:
+      - accept
+      - manage
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+copyright: >
+  Copyright &copy; 2024 <a href="https://github.com/ragarwalll" target="_blank">@ragarwalll</a>
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - tables
+  - pymdownx.betterem
+  - pymdownx.snippets
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true

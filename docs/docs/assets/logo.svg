@@ -1,0 +1,17 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <style>
+        path {
+        color: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+        path {
+        color: #ffffff;
+        }
+        }
+</style>
+    <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M831 93C886.229 93 931 137.772 931 193V831C931 886.229 886.228 931 831 931H193C137.772 931 93 886.228 93 831V193C93 137.772 137.772 93 193 93H831ZM721 170H454.908V436.155L303 435.902V588.099L340.977 625.831L531.115 816.014L568.839 854H721V701.803L683.023 664.07L492.885 473.887L454.908 436.155H721V170Z"
+        fill="currentColor" />
+</svg>

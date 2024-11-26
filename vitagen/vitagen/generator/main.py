@@ -297,7 +297,7 @@ class ResumeContentGenerator:
         ]
 
         spacing = SpacingModel[
-            self.data.get("spacing", SpacingModel.NORMAL.name).upper()
+            self.data.get("spacing", SpacingModel.ULTRA.name).upper()
         ].value
 
         self.logger.info(
@@ -347,7 +347,7 @@ class ResumeContentGenerator:
                 "\\sloppy",
                 config.group.begin,
                 config.separator,
-                config.title_format.format(section.get("heading", "")),
+                config.title_format.format(section.get("heading", "").upper()),
             ]
 
             # Process subsections if available
@@ -484,7 +484,7 @@ class ResumeContentGenerator:
                 components.append(elements.minipage[0])
 
             # Process heading
-            if heading := self.escape_latex(subsection.get("heading", "")):
+            if heading := self.escape_latex(subsection.get("heading", "").upper()):
                 new_logger = logger.bind(
                     subsection_heading=subsection.get("heading", "")
                 )
@@ -495,7 +495,7 @@ class ResumeContentGenerator:
 
             # Process info block
             if title := subsection.get("info", {}).get("title"):
-                same_line = subsection.get("info", {}).get("sameLine", False)
+                same_line = subsection.get("info", {}).get("sameLine", True)
                 new_logger.info(
                     "processing info block", info_title=title, show_same_line=same_line
                 )

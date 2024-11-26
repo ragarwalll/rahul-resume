@@ -2,8 +2,6 @@
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
-  "preset": "deedy-inspired-open-fonts",
-  "spacing": "ULTRA",
   "showLastUpdated": true,
   "links": [
     {
@@ -30,12 +28,12 @@
     "sections": [
       {
         "id": "experience",
-        "heading": "EXPERIENCE",
+        "heading": "experience",
         "column": 1,
         "columnSettings": 1,
         "subsections": [
           {
-            "heading": "COURSERA",
+            "heading": "coursera",
             "info": {
               "title": "KPCB Fellow + Software Engineering Intern",
               "sameLine": true
@@ -238,7 +236,7 @@
             }
           },
           {
-            "heading": "CORNELL UNIVERSITY",
+            "heading": "CORNELL UNIVERSITy",
             "info": {
               "title": "BS in Computer Science",
               "sameLine": true

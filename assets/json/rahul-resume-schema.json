@@ -181,6 +181,11 @@
           "type": "string",
           "description": "The section heading"
         },
+        "moveToEnd": {
+          "type": "boolean",
+          "description": "Whether this section should be moved to the end of the resume",
+          "default": false
+        },
         "column": {
           "type": "integer",
           "minimum": 1,
@@ -223,6 +228,11 @@
     "lastName": {
       "type": "string",
       "description": "Last name of the resume owner"
+    },
+    "hideFooter": {
+      "type": "boolean",
+      "description": "Whether to hide the footer section of the resume",
+      "default": false
     },
     "preset": {
       "type": "string",

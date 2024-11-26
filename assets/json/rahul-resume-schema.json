@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Schema for rahul's resume generator https://github.com/ragarwalll/rahul-resume",
+  "definitions": {
+    "textSegment": {
+      "type": "object",
+      "description": "A segment of text that can be styled and optionally linked",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The actual text content"
+        },
+        "style": {
+          "type": "object",
+          "description": "Styling options for the text segment",
+          "properties": {
+            "bold": {
+              "type": "boolean",
+              "description": "Whether the text should be bold",
+              "default": false
+            },
+            "italic": {
+              "type": "boolean",
+              "description": "Whether the text should be italicized",
+              "default": false
+            },
+            "underline": {
+              "type": "boolean",
+              "description": "Whether the text should be underlined",
+              "default": false
+            }
+          }
+        },
+        "href": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional URL if the text should be a hyperlink"
+        }
+      },
+      "required": ["text"]
+    },
+    "inlineList": {
+      "type": "object",
+      "description": "A list that appears inline with custom separator",
+      "properties": {
+        "separator": {
+          "type": "string",
+          "description": "Character or string used to separate list items",
+          "default": "•"
+        },
+        "items": {
+          "type": "array",
+          "description": "Array of strings to be displayed inline",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["items"]
+    },
+    "listItem": {
+      "type": "object",
+      "description": "An item in a list that can contain text segments and/or an inline list",
+      "properties": {
+        "segments": {
+          "type": "array",
+          "description": "Array of text segments that make up the list item",
+          "items": { "$ref": "#/definitions/textSegment" }
+        },
+        "inlineList": { "$ref": "#/definitions/inlineList" }
+      }
+    },
+    "content": {
+      "type": "object",
+      "description": "Content block that can be either a list, paragraph, or table",
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "list",
+              "description": "Indicates this content is a list"
+            },
+            "style": {
+              "type": "object",
+              "description": "Styling options for the list",
+              "properties": {
+                "showBullets": {
+                  "type": "boolean",
+                  "description": "Whether to show bullets before list items"
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "description": "Array of list items",
+              "items": { "$ref": "#/definitions/listItem" }
+            }
+          },
+          "required": ["type", "items"]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "paragraph",
+              "description": "Indicates this content is a paragraph"
+            },
+            "text": {
+              "type": "string",
+              "description": "The paragraph text content"
+            }
+          },
+          "required": ["type", "text"]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "table",
+              "description": "Indicates this content is a table"
+            },
+            "rows": {
+              "type": "array",
+              "description": "Array of table rows, each containing array of cell values",
+              "items": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "required": ["type", "rows"]
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata information for subsections such as duration and location",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "description": "Time period or duration (e.g., 'Jan 2020 - Present')"
+        },
+        "location": {
+          "type": "string",
+          "description": "Geographic location or institution location"
+        }
+      }
+    },
+    "info": {
+      "type": "object",
+      "description": "Additional information for subsections",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title or role description"
+        },
+        "sameLine": {
+          "type": "boolean",
+          "description": "Whether the title should appear on the same line as the heading",
+          "default": false
+        }
+      }
+    },
+    "subsection": {
+      "type": "object",
+      "description": "A subsection within a main section containing detailed information",
+      "required": ["heading"],
+      "properties": {
+        "heading": {
+          "type": "string",
+          "description": "The subsection heading (e.g., company name, project name)"
+        },
+        "info": { "$ref": "#/definitions/info" },
+        "metadata": { "$ref": "#/definitions/metadata" },
+        "content": { "$ref": "#/definitions/content" }
+      }
+    },
+    "section": {
+      "type": "object",
+      "description": "A main section of the resume (e.g., Experience, Education)",
+      "required": ["heading"],
+      "properties": {
+        "heading": {
+          "type": "string",
+          "description": "The section heading"
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2,
+          "default": 1,
+          "description": "Which column this section should appear in (1 or 2)"
+        },
+        "columnSettings": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 1,
+          "description": "Number of columns for this section's content (1 to 5)"
+        },
+        "fullWidth": {
+          "type": "boolean",
+          "description": "Whether this section should span both columns",
+          "default": false
+        },
+        "subsections": {
+          "type": "array",
+          "description": "Array of subsections within this section",
+          "items": { "$ref": "#/definitions/subsection" }
+        },
+        "content": { "$ref": "#/definitions/content" }
+      }
+    }
+  },
+  "required": ["firstName", "lastName", "resume"],
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "First name of the resume owner"
+    },
+    "middleName": {
+      "type": "string",
+      "description": "Middle name of the resume owner",
+      "default": ""
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Last name of the resume owner"
+    },
+    "preset": {
+      "type": "string",
+      "enum": ["deedy-inspired-open-fonts", "carlito", "montserrat"],
+      "default": "deedy-inspired-open-fonts",
+      "description": "Visual style preset to be applied to the resume"
+    },
+    "spacing": {
+      "type": "string",
+      "enum": [
+        "tight",
+        "ultra",
+        "maximum",
+        "high_dense",
+        "pro_dense",
+        "semi_dense",
+        "light_dense",
+        "compact",
+        "normal",
+        "cozy",
+        "airy",
+        "minimal",
+        "spacious"
+      ],
+      "default": "ultra",
+      "description": "Spacing preset for the resume layout"
+    },
+    "showLastUpdated": {
+      "type": "boolean",
+      "description": "Whether to show the last updated timestamp on the resume",
+      "default": true
+    },
+    "links": {
+      "type": "array",
+      "description": "Social media and other relevant links",
+      "items": {
+        "type": "object",
+        "required": ["text", "href"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Display text for the link"
+          },
+          "href": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL for the link"
+          },
+          "column": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "default": 1,
+            "description": "Which column this link should appear in (1 to 5)"
+          }
+        }
+      }
+    },
+    "resume": {
+      "type": "object",
+      "description": "Main resume content container",
+      "required": ["sections"],
+      "properties": {
+        "sections": {
+          "type": "array",
+          "description": "Array of main sections in the resume",
+          "items": { "$ref": "#/definitions/section" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+% cmd/footer-text.tex - Shows the footer text
+% chktex-file 1
+
+% Footer text with Vitagen link in italic
+\newcommand{\footertext}{\begin{textblock}{60} (152,270)% 
+    \color{date}%
+    \ifx\lastupdatedfontpath\empty%
+      \fontspec{\lastupdatedfont}%
+    \else%
+      \fontspec[Path = \lastupdatedfontpath]{\lastupdatedfont}%
+    \fi%
+    \fontsize{\smallfontsize}{\smallfontheight}%
+    \selectfont%
+    \raggedleft% Right align the text
+    \textit{This resume was generated using \href{https://therahulagarwal.com/rahul-resume/}{\dotuline{Vitagen}}}%
+  \end{textblock}%
+}%

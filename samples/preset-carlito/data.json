@@ -3,6 +3,7 @@
   "firstName": "Rahul",
   "middleName": "",
   "lastName": "Agarwal",
+  "preset": "carlito",
   "showLastUpdated": true,
   "links": [
     {
@@ -327,6 +328,103 @@
         ]
       },
       {
+        "heading": "Links",
+        "column": 2,
+        "content": {
+          "type": "list",
+          "style": {
+            "showBullets": false
+          },
+          "items": [
+            {
+              "segments": [
+                { "text": "Github://" },
+                {
+                  "text": "ragarwalll",
+                  "href": "https://github.com/ragarwalll",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "LinkedIn://" },
+                {
+                  "text": "ragarwalll",
+                  "href": "https://www.linkedin.com/in/ragarwalll",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Portfolio://" },
+                {
+                  "text": "therahulagarwal.com",
+                  "href": "https://therahulagarwal.com",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "BlueSky://" },
+                {
+                  "text": "@therahulagarwal.com",
+                  "href": "https://bsky.app/profile/therahulagarwal.com",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Gmail://" },
+                {
+                  "text": "agarwal.rahul324",
+                  "href": "mailto:agarwal.rahul324@gmail.com",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "Mail://" },
+                {
+                  "text": "contact@therahulagarwal.com",
+                  "href": "mailto:contact@therahulagarwal.com",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            },
+            {
+              "segments": [
+                { "text": "NPM://" },
+                {
+                  "text": "@ragarwal06",
+                  "href": "https://www.npmjs.com/~ragarwal06",
+                  "style": {
+                    "bold": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+
+      {
         "heading": "Skills",
         "column": 2,
         "columnSettings": 1,
@@ -437,103 +535,6 @@
             }
           }
         ]
-      },
-
-      {
-        "heading": "Links",
-        "column": 2,
-        "content": {
-          "type": "list",
-          "style": {
-            "showBullets": false
-          },
-          "items": [
-            {
-              "segments": [
-                { "text": "Github://" },
-                {
-                  "text": "ragarwalll",
-                  "href": "https://github.com/ragarwalll",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "LinkedIn://" },
-                {
-                  "text": "ragarwalll",
-                  "href": "https://www.linkedin.com/in/ragarwalll",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "Portfolio://" },
-                {
-                  "text": "therahulagarwal.com",
-                  "href": "https://therahulagarwal.com",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "BlueSky://" },
-                {
-                  "text": "@therahulagarwal.com",
-                  "href": "https://bsky.app/profile/therahulagarwal.com",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "Gmail://" },
-                {
-                  "text": "agarwal.rahul324",
-                  "href": "mailto:agarwal.rahul324@gmail.com",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "Mail://" },
-                {
-                  "text": "contact@therahulagarwal.com",
-                  "href": "mailto:contact@therahulagarwal.com",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            },
-            {
-              "segments": [
-                { "text": "NPM://" },
-                {
-                  "text": "@ragarwal06",
-                  "href": "https://www.npmjs.com/~ragarwal06",
-                  "style": {
-                    "bold": true
-                  }
-                }
-              ]
-            }
-          ]
-        }
       }
     ]
   }

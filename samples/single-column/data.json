@@ -292,7 +292,8 @@
       },
       {
         "heading": "Education",
-        "column": 2,
+        "column": 1,
+        "columnSettings": 2,
         "subsections": [
           {
             "heading": "BITS Pilani, Rajasthan",
@@ -328,8 +329,8 @@
       },
       {
         "heading": "Skills",
-        "column": 2,
-        "columnSettings": 1,
+        "column": 1,
+        "columnSettings": 2,
         "subsections": [
           {
             "heading": "Programming Languages",
@@ -438,10 +439,9 @@
           }
         ]
       },
-
       {
         "heading": "Links",
-        "column": 2,
+        "column": 1,
         "content": {
           "type": "list",
           "style": {

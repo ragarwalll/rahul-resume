@@ -6,7 +6,8 @@ resume.out
 resume.aux
 node_modules
 resume.fdb_latexmk
-*.pdf
+resume.pdf
+!samples/**/resume.pdf
 out.tex
 resume_data.jsonparse
 resume.xdv

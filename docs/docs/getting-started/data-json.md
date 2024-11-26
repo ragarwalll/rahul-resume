@@ -140,6 +140,21 @@ Please find the schema for the `data.json` file below.
 
           If you have a lot of content, it is advisable to use `ultra` or `tight` spacing.
 
+=== ":material-page-layout-footer: Hide Footer"
+
+    ```{ .json .copy .select .annotate hl_lines="5"}
+    {
+      "firstName": "Rahul",
+      "preset": "deedy-inspired-open-fonts",
+      "spacing": "ultra"
+      "hideFooter": true // (1)
+    }
+    ```
+
+    1. :material-help-circle: Optional. Defines if the footer should be hidden. Default is `false`.
+
+    By default, the footer contains the `This resume was generated using` text. If you don't want to display it, you can use this field.
+
 ### Sections
 
 `key: resume.sections[]`

@@ -101,6 +101,7 @@
 
   % load the custom commands
   \input{cmd/last-updated.tex}
+  \input{cmd/footer-text.tex}
   \input{cmd/name-section.tex}
   \input{cmd/alt-sub-section.tex}
   \input{cmd/section-seperator.tex}

@@ -341,7 +341,11 @@ class ResumeContentGenerator:
 
         def build_section() -> List[str]:
             """Build section components"""
+
+            move_to_end = section.get("moveToEnd", False)
+
             components = [
+                "\\vfill" if move_to_end else "",
                 minipage_env.begin,
                 "%",  # LaTeX comment
                 "\\sloppy",
@@ -493,6 +497,7 @@ class ResumeContentGenerator:
                 # Add heading
                 components.append(elements.heading_format.format(heading))
 
+            has_info = False
             # Process info block
             if title := subsection.get("info", {}).get("title"):
                 same_line = subsection.get("info", {}).get("sameLine", True)
@@ -500,8 +505,15 @@ class ResumeContentGenerator:
                     "processing info block", info_title=title, show_same_line=same_line
                 )
 
+                has_info = True
                 # Add info block
-                components.append(self.display_info(title, same_line=same_line))
+                components.append(
+                    self.display_info(
+                        title,
+                        same_line=same_line,
+                        has_heading=subsection.get("heading", "") != "",
+                    )
+                )
 
             # Process metadata
             if metadata := subsection.get("metadata", {}):
@@ -513,6 +525,8 @@ class ResumeContentGenerator:
                         duration=metadata.get("duration"),
                     )
 
+                    if not has_info:
+                        components.append("\\newline%")
                     # Add additional info
                     components.append(
                         self.display_additional_info(
@@ -541,6 +555,7 @@ class ResumeContentGenerator:
         self,
         text: str,
         same_line: bool = False,
+        has_heading: bool = True,
         config: Optional[InfoFormatConfig] = None,
     ) -> str:
         """
@@ -549,6 +564,7 @@ class ResumeContentGenerator:
         Args:
             text: Text content to display
             same_line: If True, adds pipe separator before text
+            has_heading: If True, adds newline before info block
             config: Optional formatting configuration
 
         Returns:
@@ -573,7 +589,9 @@ class ResumeContentGenerator:
 
         def format_info(display_mode: DisplayMode) -> str:
             """Format info text with appropriate prefixes"""
-            prefix = config.get_prefix(display_mode)
+            prefix = ""
+            if has_heading:
+                prefix = config.get_prefix(display_mode)
             escaped_text = escape_func(text)
 
             return "".join(
@@ -778,21 +796,26 @@ class ResumeContentGenerator:
 
             components = []
 
-            # Add environment begin
-            components.append(f"\\begin{{{env}}}")
-
             # Add segments if present
             if segments := item.get("segments"):
+                # Add environment begin
+                components.append(f"\\begin{{{env}}}")
+
                 logger.info("found segments", total_segments=len(segments))
+
                 components.append(format_segments(segments))
+                # Add environment end
+                components.append(f"\\end{{{env}}}")
             else:
                 logger.warning("no segments found")
 
-            # Add environment end
-            components.append(f"\\end{{{env}}}")
-
             # Add inline list if present
             if inline_list := item.get("inlineList"):
+                # check if segments exist`
+                # if yes append newline to the end of the segments
+                if not item.get("segments"):
+                    components.append("\\newline%")
+
                 components.append(
                     self.display_inline_list(
                         inline_list, logger.bind(content_type="inline_list")
@@ -1048,5 +1071,8 @@ class ResumeContentGenerator:
             )
         )
         self.logger.info("processed sections")
+
+        if not self.data.get("hideFooter", False):
+            output.append("\\footertext%")
 
         return self.format_output_array(output)

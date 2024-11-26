@@ -649,6 +649,10 @@ Following are the supported styles.
 }
 ```
 
+!!! warning "Note"
+
+      Please use `underline` with caution as some ATS might not read it properly.
+
 #### Inline List
 
 Let's say you wanna display a list without new lines. Something like this.

@@ -1,13 +1,14 @@
 {
   "name": "rahul-resume",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Rahul Agarwal's Resume",
   "scripts": {
     "prepare": "husky",
-    "release": "standard-version",
-    "release:minor": "standard-version --release-as minor",
-    "release:patch": "standard-version --release-as patch",
-    "release:major": "standard-version --release-as major",
+    "release": "standard-version --no-verify --commit-all",
+    "release:first": "standard-version --first-release --no-verify --commit-all",
+    "release:minor": "standard-version --release-as minor --no-verify --commit-all",
+    "release:patch": "standard-version --release-as patch --no-verify --commit-all",
+    "release:major": "standard-version --release-as major --no-verify --commit-all",
     "commit:lint": "commitlint --edit",
     "build": "node scripts/build.js",
     "lint": "run-s latex:lint python:lint",
@@ -20,7 +21,13 @@
     "type": "git",
     "url": "https://github.com/ragarwalll/resumate.git"
   },
-  "keywords": [],
+  "keywords": [
+    "latex",
+    "resume",
+    "vitae",
+    "cv",
+    "resume-template"
+  ],
   "author": "ragarwalll <agarwal.rahul324@gmail.com>",
   "license": "Apache-2.0",
   "packageManager": "^bun@1.1.0",
@@ -38,8 +45,8 @@
     "standard-version": "^9.5.0"
   },
   "standard-version": {
-    "skip": {
-      "tag": true
+    "scripts": {
+      "postchangelog": "cp CHANGELOG.md docs/docs/getting-started/changelog.md && git add docs/docs/getting-started/changelog.md"
     }
   },
   "dependencies": {

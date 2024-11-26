@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vitagen"
-version = "0.0.0"
+version = "1.0.0"
 description = "Preprocessing the data for the resume"
 authors = ["ragarwalll <agarwal.rahul324@gmail.com>"]
 readme = "README.md"

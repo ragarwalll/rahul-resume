@@ -14,7 +14,7 @@ There are two ways to generate the resume:
 
 === ":octicons-discussion-duplicate-16: GitHub Issues"
 
-    Once you have the `data.json` file, you can create a new issue in the [repository](https://github.com/ragarwalll/rahul-resume/issues) or use the already created issue [here](https://github.com/ragarwalll/rahul-resume/issues/8)
+    Once you have the `data.json` file, you can create a new issue in the [repository](https://github.com/ragarwalll/rahul-resume/issues/new?assignees=&labels=prepare-resume&projects=&template=generate-resume.md&title=Create+a+new+resume) or use the already created issue [here](https://github.com/ragarwalll/rahul-resume/issues/10)
 
     Now, all you need to do is comment `/trigger` & upload the `data.json` file. The bot will take care of the rest.
 

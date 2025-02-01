@@ -84,10 +84,10 @@ jobs:
           # Create log directory if it doesn't exist
           mkdir -p logs
           {
-            poetry --directory vitagen run start-module --input data.json --output processor/python-data.tex
+            poetry --directory vitagen run start-module --input $GITHUB_WORKSPACE/data.json --output $GITHUB_WORKSPACE/processor/python-data.tex
           } 2>&1 | tee logs/python_script.log
 
-          poetry --directory vitagen run start-module --input data.json --output processor/python-data.tex
+          poetry --directory vitagen run start-module --input $GITHUB_WORKSPACE/data.json --output $GITHUB_WORKSPACE/processor/python-data.tex
 
           if [ -f processor/python-data.tex ]; then
             echo "data_generated=true" >> $GITHUB_OUTPUT

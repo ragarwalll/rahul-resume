@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-structlog = "^24.4.0"
+structlog = "^25.2.0"
 python-dotenv = "^1.0.1"
 pygments = "^2.18.0"
 argparse = "^1.4.0"

@@ -14,7 +14,7 @@ argparse = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.1"
-black = "^25.1.0"
+black = "^26.1.0"
 pylint = "^4.0.4"
 
 [tool.poetry.scripts]
